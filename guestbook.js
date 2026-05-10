@@ -108,11 +108,9 @@ if (typeof FIREBASE_CONFIG === 'undefined') {
   // ═══════════════════════════════
   let currentUser = null;
 
-  const loginArea   = document.getElementById('gbLoginArea');
   const userArea    = document.getElementById('gbUserArea');
   const userPhoto   = document.getElementById('gbUserPhoto');
   const userName    = document.getElementById('gbUserName');
-  const loginBtn    = document.getElementById('gbLoginBtn');
   const logoutBtn   = document.getElementById('gbLogoutBtn');
   const gbForm      = document.getElementById('gbForm');
   const gbText      = document.getElementById('gbText');
@@ -124,23 +122,40 @@ if (typeof FIREBASE_CONFIG === 'undefined') {
   auth.onAuthStateChanged(user => {
     currentUser = user;
     if (user) {
-      loginArea.style.display = 'none';
-      userArea.style.display  = 'flex';
-      userPhoto.src           = user.photoURL || '';
-      userPhoto.style.display = user.photoURL ? 'block' : 'none';
-      userName.textContent    = user.displayName || user.email;
-      gbForm.style.display    = 'block';
+      if (userArea) userArea.style.display = 'flex';
+      if (userPhoto) { userPhoto.src = user.photoURL || ''; userPhoto.style.display = user.photoURL ? 'block' : 'none'; }
+      if (userName) userName.textContent = user.displayName || user.email;
+      if (gbForm) gbForm.style.display = 'block';
       checkPending(user.uid);
     } else {
-      loginArea.style.display = 'block';
-      userArea.style.display  = 'none';
-      gbForm.style.display    = 'none';
+      if (userArea) userArea.style.display = 'none';
+      if (gbForm) gbForm.style.display = 'none';
       if (gbPending) gbPending.style.display = 'none';
     }
   });
 
-  if (loginBtn)  loginBtn.addEventListener('click', () => auth.signInWithPopup(googleProvider).catch(() => fbShowToast('로그인에 실패했습니다.')));
   if (logoutBtn) logoutBtn.addEventListener('click', () => auth.signOut());
+
+  window.openMessageForm = function () {
+    const targetEl = document.getElementById('gb-form-area');
+    if (currentUser) {
+      if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => { if (gbText) gbText.focus(); }, 600);
+      return;
+    }
+    auth.signInWithPopup(googleProvider)
+      .then(() => {
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => { if (gbText) gbText.focus(); }, 800);
+      })
+      .catch(err => {
+        if (err.code === 'auth/popup-blocked') {
+          auth.signInWithRedirect(googleProvider);
+        } else {
+          fbShowToast('로그인에 실패했습니다. (' + (err.code || '오류') + ')');
+        }
+      });
+  };
 
   if (gbText) gbText.addEventListener('input', () => {
     gbCharCount.textContent = `${gbText.value.length} / 300`;
