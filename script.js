@@ -293,8 +293,12 @@ const contactMessage = document.getElementById('contactMessage');
 
 if (contactType && contactMessage) {
   contactType.addEventListener('change', function () {
+    if (this.value === 'apply') {
+      window.location.href = 'apply.html';
+      return;
+    }
     contactMessage.placeholder = contactPlaceholders[this.value] || contactPlaceholders[''];
-    contactMessage.rows = this.value === 'apply' ? 7 : 5;
+    contactMessage.rows = 5;
   });
 }
 
