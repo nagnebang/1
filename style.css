@@ -326,6 +326,8 @@ ul { list-style: none; }
 .essay-preview { font-size: 14px; color: var(--ink-mid); line-height: 1.7; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .essay-author { font-size: 12px; font-weight: 600; color: var(--tan); letter-spacing: 0.04em; }
 .essay-more { font-size: 13px; font-weight: 600; color: var(--teal); margin-top: 4px; }
+.essay-card.press { border-top: 2px solid var(--teal); cursor: default; }
+.press-source { font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: 0.06em; text-transform: uppercase; }
 
 /* Essay modal */
 .essay-modal { max-width: 640px; max-height: 85vh; overflow-y: auto; }
