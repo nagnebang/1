@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>메시지 시드 추가</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 60px auto; padding: 0 20px; }
+    button { padding: 12px 24px; background: #669999; color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    button:disabled { opacity: 0.5; }
+    #status { margin-top: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <h2>응원 메시지 초기 데이터 추가</h2>
+  <p>아래 버튼을 한 번만 클릭하면 응원 메시지 3개가 추가됩니다.</p>
+  <button id="btn" onclick="seed()">메시지 추가하기</button>
+  <div id="status"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.firestore();
+
+    const messages = [
+      {
+        name: '후원자 이진희',
+        message: '나그네방을 알게 된 지 벌써 3년이 됐어요. 방 한 칸이 누군가의 삶을 이렇게 바꿀 수 있다는 걸 나그네방을 통해 처음 알았습니다. 오래오래 이어지길 응원합니다.',
+        photoURL: '',
+        uid: 'seed-1',
+        email: '',
+        approved: true,
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-03-10')),
+      },
+      {
+        name: '전 나그네 박서윤',
+        message: '나그네방에서 보낸 8개월이 제 인생에서 가장 많이 성장한 시간이었어요. 운영자님이 주신 공간과 신뢰 덕분에 지금의 제가 있습니다. 감사합니다, 나그네방 💛',
+        photoURL: '',
+        uid: 'seed-2',
+        email: '',
+        approved: true,
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-02-14')),
+      },
+      {
+        name: '이웃 주민 최민준',
+        message: '동네에서 이런 공동체가 운영되고 있다는 게 얼마나 소중한지 모릅니다. 청년들이 서로 기대며 각자의 길을 찾아가는 모습이 아름다워요. 계속 응원하겠습니다!',
+        photoURL: '',
+        uid: 'seed-3',
+        email: '',
+        approved: true,
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-01-22')),
+      },
+    ];
+
+    async function seed() {
+      const btn = document.getElementById('btn');
+      const status = document.getElementById('status');
+      btn.disabled = true;
+      status.textContent = '추가 중...';
+      try {
+        for (const msg of messages) {
+          await db.collection('messages').add(msg);
+        }
+        status.textContent = '✅ 완료! 메시지 3개가 추가되었습니다. 이 페이지는 닫아도 됩니다.';
+      } catch (e) {
+        status.textContent = '❌ 오류: ' + e.message;
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
