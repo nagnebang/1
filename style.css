@@ -838,6 +838,11 @@ a.essay-card.press:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: t
   text-decoration: none;
   margin-top: 8px;
   display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
 }
 .support-stay .support-link-btn { color: rgba(255,255,255,0.85); }
 .support-stay:hover .support-link-btn { color: #fff; }
