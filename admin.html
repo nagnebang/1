@@ -226,6 +226,31 @@
     .seed-area p { font-size: .85rem; color: #666; }
 
     /* ════════════════════════════════
+       공통 데이터 카드
+    ════════════════════════════════ */
+    .badge-new { background: #e74c3c; }
+    .panel-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .panel-count { font-size: .85rem; color: var(--muted); }
+    .data-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 12px;
+    }
+    .data-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
+    .data-card-name { font-weight: 600; font-size: .95rem; }
+    .data-card-date { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+    .data-card-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 10px; }
+    .data-meta-item { font-size: .82rem; color: var(--muted); }
+    .data-meta-item strong { color: var(--ink); font-weight: 500; }
+    .data-card-body { font-size: .88rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; background: var(--bg); padding: 12px 14px; border-radius: 8px; }
+    .data-card-actions { margin-top: 12px; display: flex; gap: 8px; }
+    .status-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .status-unread { background: #fff3cd; color: #856404; }
+    .status-read   { background: #e8f5e9; color: #2e7d32; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-contacted { background: #e3f2fd; color: #1565c0; }
+    .status-done    { background: #e8f5e9; color: #2e7d32; }
+
+    /* ════════════════════════════════
        TAB 3 : 갤러리 관리
     ════════════════════════════════ */
     .gallery-grid {
@@ -316,9 +341,12 @@
 
     <!-- 메인 탭 -->
     <div class="main-tab-bar">
-      <div class="main-tab active" data-tab="messages">메시지 검토 <span class="badge" id="pendingCount">0</span></div>
-      <div class="main-tab"        data-tab="essays">에세이 관리</div>
-      <div class="main-tab"        data-tab="gallery">갤러리 관리</div>
+      <div class="main-tab active" data-tab="messages">메시지 <span class="badge" id="pendingCount">0</span></div>
+      <div class="main-tab"        data-tab="contacts">문의하기 <span class="badge badge-new" id="contactCount">0</span></div>
+      <div class="main-tab"        data-tab="applications">입주 신청 <span class="badge badge-new" id="appCount">0</span></div>
+      <div class="main-tab"        data-tab="donors">후원 정보</div>
+      <div class="main-tab"        data-tab="essays">에세이</div>
+      <div class="main-tab"        data-tab="gallery">갤러리</div>
     </div>
 
     <!-- ════════ PANEL: 메시지 검토 ════════ -->
@@ -469,6 +497,30 @@
         <p>갤러리 컬렉션이 비어있을 때만 기존 사진을 가져옵니다.</p>
         <button class="btn btn-ghost" id="seedGalleryBtn">기존 데이터 가져오기</button>
       </div>
+    </div>
+
+    <!-- ════════ PANEL: 문의하기 ════════ -->
+    <div class="panel" id="panel-contacts">
+      <div class="panel-toolbar">
+        <span class="panel-count" id="contactCountLabel">0건</span>
+      </div>
+      <div id="contactList"><p class="empty">문의 내역이 없습니다.</p></div>
+    </div>
+
+    <!-- ════════ PANEL: 입주 신청 ════════ -->
+    <div class="panel" id="panel-applications">
+      <div class="panel-toolbar">
+        <span class="panel-count" id="appCountLabel">0건</span>
+      </div>
+      <div id="applicationList"><p class="empty">신청 내역이 없습니다.</p></div>
+    </div>
+
+    <!-- ════════ PANEL: 후원 정보 ════════ -->
+    <div class="panel" id="panel-donors">
+      <div class="panel-toolbar">
+        <span class="panel-count" id="donorCountLabel">0건</span>
+      </div>
+      <div id="donorList"><p class="empty">후원 정보가 없습니다.</p></div>
     </div>
 
   </div><!-- /adminPanel -->
@@ -982,15 +1034,154 @@ function startListeners() {
   startMessages();
   startEssays();
   startGallery();
+  startContacts();
+  startApplications();
+  startDonors();
+}
+
+/* ══════════════════════════════════════════════════════
+   TAB: 문의하기
+══════════════════════════════════════════════════════ */
+function startContacts() {
+  db.collection('contacts').orderBy('submittedAt', 'desc').limit(100)
+    .onSnapshot(snap => {
+      const n = snap.size;
+      document.getElementById('contactCount').textContent = n;
+      document.getElementById('contactCountLabel').textContent = n + '건';
+      const el = document.getElementById('contactList');
+      if (snap.empty) { el.innerHTML = '<p class="empty">문의 내역이 없습니다.</p>'; return; }
+      el.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const date = d.submittedAt ? fmtDate(d.submittedAt.toDate()) : '';
+        const typeLabel = {donate:'후원 문의', partner:'협력 제안', apply:'입주 신청', other:'기타'}[d.type] || d.type || '기타';
+        const statusClass = d.status === 'read' ? 'status-read' : 'status-unread';
+        const statusLabel = d.status === 'read' ? '확인됨' : '미확인';
+        return `<div class="data-card">
+          <div class="data-card-header">
+            <span class="data-card-name">${esc(d.name || '익명')}</span>
+            <span class="data-card-date">${esc(date)}</span>
+          </div>
+          <div class="data-card-meta">
+            <span class="data-meta-item">✉️ <strong>${esc(d.email || '')}</strong></span>
+            <span class="data-meta-item">유형: <strong>${esc(typeLabel)}</strong></span>
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+          </div>
+          <div class="data-card-body">${esc(d.message || '')}</div>
+          <div class="data-card-actions">
+            <button class="btn btn-teal" onclick="markContactRead('${doc.id}')">✓ 확인 처리</button>
+            <button class="btn btn-outline-danger" onclick="deleteContact('${doc.id}')">삭제</button>
+          </div>
+        </div>`;
+      }).join('');
+    }, err => showToast('문의 불러오기 실패: ' + err.message, true));
+}
+async function markContactRead(id) {
+  await db.collection('contacts').doc(id).update({ status: 'read' });
+  showToast('확인 처리했습니다.');
+}
+async function deleteContact(id) {
+  if (!confirm('이 문의를 삭제하시겠습니까?')) return;
+  await db.collection('contacts').doc(id).delete();
+  showToast('삭제했습니다.');
+}
+
+/* ══════════════════════════════════════════════════════
+   TAB: 입주 신청
+══════════════════════════════════════════════════════ */
+function startApplications() {
+  db.collection('applications').orderBy('submittedAt', 'desc').limit(100)
+    .onSnapshot(snap => {
+      const n = snap.size;
+      document.getElementById('appCount').textContent = n;
+      document.getElementById('appCountLabel').textContent = n + '건';
+      const el = document.getElementById('applicationList');
+      if (snap.empty) { el.innerHTML = '<p class="empty">신청 내역이 없습니다.</p>'; return; }
+      el.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const date = d.submittedAt ? fmtDate(d.submittedAt.toDate()) : '';
+        const statusMap = { pending:'검토 대기', contacted:'연락함', done:'처리 완료' };
+        const statusClassMap = { pending:'status-pending', contacted:'status-contacted', done:'status-done' };
+        const st = d.status || 'pending';
+        return `<div class="data-card">
+          <div class="data-card-header">
+            <span class="data-card-name">${esc(d.name || '')}</span>
+            <span class="data-card-date">${esc(date)}</span>
+          </div>
+          <div class="data-card-meta">
+            <span class="data-meta-item">📞 <strong>${esc(d.contact || '')}</strong></span>
+            <span class="data-meta-item">나이: <strong>${esc(d.age || '')}</strong></span>
+            <span class="data-meta-item">직업: <strong>${esc(d.job || '')}</strong></span>
+            <span class="data-meta-item">이사 시기: <strong>${esc(d.moveIn || '')}</strong></span>
+            <span class="data-meta-item">거주 기간: <strong>${esc(d.duration || '')}</strong></span>
+            <span class="status-badge ${statusClassMap[st]}">${statusMap[st]}</span>
+          </div>
+          <div class="data-card-body">${esc(d.reason || '')}</div>
+          <div class="data-card-actions">
+            <button class="btn btn-teal" onclick="updateAppStatus('${doc.id}','contacted')">연락함</button>
+            <button class="btn btn-ghost" onclick="updateAppStatus('${doc.id}','done')">처리 완료</button>
+            <button class="btn btn-outline-danger" onclick="deleteApp('${doc.id}')">삭제</button>
+          </div>
+        </div>`;
+      }).join('');
+    }, err => showToast('신청 불러오기 실패: ' + err.message, true));
+}
+async function updateAppStatus(id, status) {
+  await db.collection('applications').doc(id).update({ status });
+  showToast('상태를 업데이트했습니다.');
+}
+async function deleteApp(id) {
+  if (!confirm('이 신청을 삭제하시겠습니까?')) return;
+  await db.collection('applications').doc(id).delete();
+  showToast('삭제했습니다.');
+}
+
+/* ══════════════════════════════════════════════════════
+   TAB: 후원 정보
+══════════════════════════════════════════════════════ */
+function startDonors() {
+  db.collection('donors').orderBy('submittedAt', 'desc').limit(200)
+    .onSnapshot(snap => {
+      document.getElementById('donorCountLabel').textContent = snap.size + '건';
+      const el = document.getElementById('donorList');
+      if (snap.empty) { el.innerHTML = '<p class="empty">후원 정보가 없습니다.</p>'; return; }
+      el.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const date = d.submittedAt ? fmtDate(d.submittedAt.toDate()) : '';
+        return `<div class="data-card">
+          <div class="data-card-header">
+            <span class="data-card-name">${esc(d.name || '익명')}</span>
+            <span class="data-card-date">${esc(date)}</span>
+          </div>
+          <div class="data-card-meta">
+            <span class="data-meta-item">✉️ <strong>${esc(d.email || '')}</strong></span>
+            <span class="data-meta-item">유형: <strong>${esc(d.type || '')}</strong></span>
+            <span class="data-meta-item">금액: <strong>${esc(d.amount || '')}</strong></span>
+          </div>
+          <div class="data-card-actions">
+            <button class="btn btn-outline-danger" onclick="deleteDonor('${doc.id}')">삭제</button>
+          </div>
+        </div>`;
+      }).join('');
+    }, err => showToast('후원 정보 불러오기 실패: ' + err.message, true));
+}
+async function deleteDonor(id) {
+  if (!confirm('이 후원 정보를 삭제하시겠습니까?')) return;
+  await db.collection('donors').doc(id).delete();
+  showToast('삭제했습니다.');
 }
 
 /* ══════════════════════════════════════════════════════
    전역 함수 (인라인 onclick용)
 ══════════════════════════════════════════════════════ */
-window.approveMsg    = approveMsg;
-window.deleteMsg     = deleteMsg;
-window.deleteEssay   = deleteEssay;
-window.deleteGallery = deleteGallery;
+window.approveMsg        = approveMsg;
+window.deleteMsg         = deleteMsg;
+window.deleteEssay       = deleteEssay;
+window.deleteGallery     = deleteGallery;
+window.markContactRead   = markContactRead;
+window.deleteContact     = deleteContact;
+window.updateAppStatus   = updateAppStatus;
+window.deleteApp         = deleteApp;
+window.deleteDonor       = deleteDonor;
 </script>
 </body>
 </html>

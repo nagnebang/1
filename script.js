@@ -279,6 +279,29 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
+// ─── DONOR REGISTRATION ───
+async function submitDonor(type) {
+  const suffix = type === 'regular' ? 'Regular' : 'Once';
+  const name   = document.getElementById('donorName'   + suffix).value.trim();
+  const email  = document.getElementById('donorEmail'  + suffix).value.trim();
+  const amount = document.getElementById('donorAmount' + suffix).value.trim();
+  if (!name && !email) { showToast('이름 또는 이메일을 입력해주세요.'); return; }
+  try {
+    if (typeof firebase !== 'undefined' && firebase.apps.length) {
+      await firebase.firestore().collection('donors').add({
+        name, email, amount,
+        type: type === 'regular' ? '정기' : '일시',
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    showToast('기록이 저장되었습니다. 감사합니다 💛');
+    document.getElementById('donorForm' + suffix).style.display = 'none';
+  } catch (err) {
+    showToast('저장 중 오류가 발생했습니다.');
+  }
+}
+window.submitDonor = submitDonor;
+
 // ─── CONTACT FORM ───
 const contactPlaceholders = {
   '':        '문의 내용을 자유롭게 적어주세요.',
@@ -302,11 +325,30 @@ if (contactType && contactMessage) {
   });
 }
 
-document.getElementById('contactForm').addEventListener('submit', function (e) {
+document.getElementById('contactForm').addEventListener('submit', async function (e) {
   e.preventDefault();
-  showToast('메시지가 전송되었습니다. 감사합니다!');
-  this.reset();
-  if (contactMessage) contactMessage.placeholder = contactPlaceholders[''];
+  const btn = this.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  const data = {
+    name:    this.contactName.value.trim(),
+    email:   this.contactEmail.value.trim(),
+    type:    document.getElementById('contactType').value,
+    message: document.getElementById('contactMessage').value.trim(),
+    submittedAt: firebase && firebase.firestore ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
+    status: 'unread'
+  };
+  try {
+    if (typeof firebase !== 'undefined' && firebase.apps.length) {
+      await firebase.firestore().collection('contacts').add(data);
+    }
+    showToast('메시지가 전송되었습니다. 감사합니다!');
+    this.reset();
+    if (contactMessage) contactMessage.placeholder = contactPlaceholders[''];
+  } catch (err) {
+    showToast('전송 중 오류가 발생했습니다. 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 // ─── LIGHTBOX ───

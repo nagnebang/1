@@ -387,6 +387,16 @@ a.essay-card.press:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: t
 .impact-row:last-child { border-bottom: none; }
 .ir-amt { font-size: 17px; font-weight: 700; color: var(--teal); }
 .ir-desc { font-size: 14px; color: var(--ink-mid); }
+.tier-rows { display: flex; flex-direction: column; gap: 0; }
+.tier-row {
+  display: grid; grid-template-columns: 1fr auto;
+  padding: 18px 0; border-bottom: 1px solid var(--border);
+  gap: 6px 16px;
+}
+.tier-row:last-child { border-bottom: none; }
+.tr-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+.tr-amt { font-size: 14px; font-weight: 600; color: var(--teal); text-align: right; white-space: nowrap; }
+.tr-desc { font-size: 13px; color: var(--ink-mid); line-height: 1.65; grid-column: 1 / -1; }
 .donate-right { display: flex; flex-direction: column; gap: 16px; }
 .donate-card-box {
   background: var(--bg); border-radius: var(--r); padding: 28px 28px 24px;
@@ -464,6 +474,9 @@ a.essay-card.press:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: t
 .bank-row strong { color: var(--ink); }
 .modal-note { font-size: 13px; color: var(--ink-light); line-height: 1.75; margin-bottom: 20px; }
 .modal-note strong { color: var(--ink); }
+.donor-form { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+.donor-form-label { font-size: 13px; color: var(--ink-light); margin-bottom: 4px; }
+.donor-form input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--bg); }
 
 /* ─── TOAST ─── */
 .toast {

@@ -478,18 +478,21 @@
           <span class="section-tag">후원하기</span>
           <h2>나그네방의<br />지지자가 되어주세요</h2>
           <p>여러분의 후원이 한 청년의 독립을 가능하게 합니다.</p>
-          <div class="impact-rows">
-            <div class="impact-row">
-              <span class="ir-amt">월 3만 원</span>
-              <span class="ir-desc">나그네 1인의 한 달 공과금</span>
+          <div class="tier-rows">
+            <div class="tier-row">
+              <span class="tr-name">나그네방을 기억하는 사람</span>
+              <span class="tr-amt">월 1만 원</span>
+              <span class="tr-desc">비정기 소식지 — 나그네방의 생생한 이야기를 전해드려요</span>
             </div>
-            <div class="impact-row">
-              <span class="ir-amt">월 5만 원</span>
-              <span class="ir-desc">나그네방 운영의 핵심 후원</span>
+            <div class="tier-row">
+              <span class="tr-name">나그네방의 이웃</span>
+              <span class="tr-amt">자유롭게</span>
+              <span class="tr-desc">금액에 상관없이, 마음이 닿는 만큼</span>
             </div>
-            <div class="impact-row">
-              <span class="ir-amt">월 10만 원</span>
-              <span class="ir-desc">새 거점 보증금 마련에 기여</span>
+            <div class="tier-row">
+              <span class="tr-name">집을 함께 짓는 사람</span>
+              <span class="tr-amt">월 10만 원</span>
+              <span class="tr-desc">나그네방 2호점 보증금 마련에 직접 이바지해요</span>
             </div>
           </div>
         </div>
@@ -528,8 +531,8 @@
         </div>
         <form class="contact-form" id="contactForm">
           <div class="form-row2">
-            <input type="text" placeholder="이름" required />
-            <input type="email" placeholder="이메일" required />
+            <input type="text" name="contactName" placeholder="이름" required />
+            <input type="email" name="contactEmail" placeholder="이메일" required />
           </div>
           <select id="contactType">
             <option value="">문의 유형</option>
@@ -590,8 +593,15 @@
           <div class="bank-row"><span>예금주</span><strong>유하영</strong></div>
           <div class="bank-row"><span>이체 메모</span><strong>이름_정기후원</strong></div>
         </div>
-        <p class="modal-note personal-account-note">⚠️ 현재 비영리 법인 설립 준비 중으로, 대표 유하영의 개인 계좌로 운영 중입니다. 법인 설립 후 법인 계좌로 전환되며, 공식 기부금 영수증을 소급 발급해 드립니다.<br /><br />후원 후 <strong>nagnabang@gmail.com</strong>으로 이름과 연락처를 남겨주시면 감사히 기록하겠습니다.</p>
+        <p class="modal-note personal-account-note">⚠️ 현재 비영리 법인 설립 준비 중으로, 대표 유하영의 개인 계좌로 운영 중입니다. 법인 설립 후 법인 계좌로 전환되며, 공식 기부금 영수증을 소급 발급해 드립니다.</p>
         <button class="btn btn-dark w-full" onclick="copyAccount()">계좌번호 복사</button>
+        <div class="donor-form" id="donorFormRegular">
+          <p class="donor-form-label">후원 후 아래에 정보를 남겨주시면 감사히 기록할게요.</p>
+          <input type="text" id="donorNameRegular" placeholder="이름" />
+          <input type="email" id="donorEmailRegular" placeholder="이메일" />
+          <input type="text" id="donorAmountRegular" placeholder="월 후원 금액 (예: 30,000원)" />
+          <button class="btn btn-outline-dark w-full" onclick="submitDonor('regular')">기록 남기기</button>
+        </div>
       </div>
       <div id="modalOnce" style="display:none">
         <h3>일시 후원하기</h3>
@@ -604,6 +614,13 @@
         </div>
         <p class="modal-note">금액에 상관없이 모든 후원은 청년들의 자립을 위해 사용됩니다.</p>
         <button class="btn btn-dark w-full" onclick="copyAccount()">계좌번호 복사</button>
+        <div class="donor-form" id="donorFormOnce">
+          <p class="donor-form-label">후원 후 아래에 정보를 남겨주시면 감사히 기록할게요.</p>
+          <input type="text" id="donorNameOnce" placeholder="이름" />
+          <input type="email" id="donorEmailOnce" placeholder="이메일" />
+          <input type="text" id="donorAmountOnce" placeholder="후원 금액 (예: 50,000원)" />
+          <button class="btn btn-outline-dark w-full" onclick="submitDonor('once')">기록 남기기</button>
+        </div>
       </div>
     </div>
   </div>
