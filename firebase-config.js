@@ -12,4 +12,4 @@ const FIREBASE_CONFIG = {
 };
 
 // 관리자 구글 계정 이메일 (메시지 승인/삭제 권한)
-const ADMIN_EMAIL = "nagenabang@gmail.com";
+const ADMIN_EMAIL = "nagnebang@gmail.com";
