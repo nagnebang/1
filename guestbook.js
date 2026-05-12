@@ -26,50 +26,10 @@ if (typeof FIREBASE_CONFIG === 'undefined') {
     setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  // ═══════════════════════════════
-  //  에세이
-  // ═══════════════════════════════
-  const essayMap = new Map();
-
-  db.collection('essays').orderBy('order').onSnapshot(snap => {
-    const operator = [], participant = [];
-    essayMap.clear();
-    snap.docs.forEach(doc => {
-      const d = { id: doc.id, ...doc.data() };
-      essayMap.set(doc.id, d);
-      if (d.category === 'participant') participant.push(d);
-      else operator.push(d);
-    });
-    renderEssays('operatorEssays', operator);
-    renderEssays('participantEssays', participant);
-  }, err => console.log('Essays:', err.message));
-
-  function renderEssays(containerId, essays) {
-    const el = document.getElementById(containerId);
-    if (!el) return;
-    if (!essays.length) return; // 로컬 기본 콘텐츠 유지
-    el.innerHTML = essays.map(e => `
-      <article class="essay-card${e.category === 'participant' ? ' participant' : ''}"
-               onclick="window.openEssay('${esc(e.id)}')">
-        <div class="essay-thumb">
-          <img src="${esc(e.thumbImage || 'images/invitation.jpeg')}" alt="" loading="lazy" />
-        </div>
-        <div class="essay-body">
-          <span class="essay-date">${esc(e.date || '')}</span>
-          <h3>${esc(e.title || '')}</h3>
-          <p class="essay-preview">${esc((e.body || '').slice(0, 110))}...</p>
-          ${e.category === 'participant' ? `<span class="essay-author">${esc(e.author || '')}</span>` : ''}
-          <span class="essay-more">전문 읽기 →</span>
-        </div>
-      </article>`).join('');
-    el.querySelectorAll('.essay-card').forEach(card => {
-      card.classList.add('fade-up');
-      requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('visible')));
-    });
-  }
+  // 에세이는 정적 HTML로만 관리 — Firestore 불러오기 없음
 
   window.openEssay = function (id) {
-    const e = essayMap.get(id);
+    const e = undefined;
     if (!e) return;
     const modal   = document.getElementById('essayModal');
     const content = document.getElementById('essayContent');

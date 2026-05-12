@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 관리자 판별
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "nagnebang@gmail.com";
+    }
+
+    // ── 응원 메시지 ──────────────────────────────
+    // 승인된 것만 공개 읽기, 누구나 작성, 어드민 전체 관리
+    match /messages/{doc} {
+      allow read:             if resource.data.approved == true || isAdmin();
+      allow create:           if true;
+      allow update, delete:   if isAdmin();
+    }
+
+    // ── 문의하기 ─────────────────────────────────
+    // 누구나 작성, 어드민만 읽기·수정·삭제
+    match /contacts/{doc} {
+      allow create:           if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── 입주 신청 ─────────────────────────────────
+    // 누구나 작성, 어드민만 읽기·수정·삭제
+    match /applications/{doc} {
+      allow create:           if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── 후원 정보 ─────────────────────────────────
+    // 누구나 작성, 어드민만 읽기·수정·삭제
+    match /donors/{doc} {
+      allow create:           if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── 에세이 ──────────────────────────────────
+    // 누구나 읽기, 어드민만 쓰기·수정·삭제
+    match /essays/{doc} {
+      allow read:   if true;
+      allow write:  if isAdmin();
+    }
+
+    // ── 갤러리 ──────────────────────────────────
+    // 누구나 읽기, 어드민만 쓰기·수정·삭제
+    match /gallery/{doc} {
+      allow read:   if true;
+      allow write:  if isAdmin();
+    }
+  }
+}

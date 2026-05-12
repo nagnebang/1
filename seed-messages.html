@@ -16,8 +16,8 @@
   <button id="btn" onclick="seed()">메시지 추가하기</button>
   <div id="status"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script>
     firebase.initializeApp(FIREBASE_CONFIG);
@@ -25,31 +25,31 @@
 
     const messages = [
       {
-        name: '후원자 이진희',
-        message: '나그네방을 알게 된 지 벌써 3년이 됐어요. 방 한 칸이 누군가의 삶을 이렇게 바꿀 수 있다는 걸 나그네방을 통해 처음 알았습니다. 오래오래 이어지길 응원합니다.',
+        name: '정소희',
+        message: '나그네방 덕분에 서울에서 처음 발을 뗄 수 있었어요. 낯선 도시에서 기댈 곳이 있다는 게 얼마나 큰 힘이 되는지 몰라요. 오래오래 계속되길 응원합니다!',
         photoURL: '',
         uid: 'seed-1',
         email: '',
         approved: true,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-03-10')),
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2025-11-03')),
       },
       {
-        name: '전 나그네 박서윤',
-        message: '나그네방에서 보낸 8개월이 제 인생에서 가장 많이 성장한 시간이었어요. 운영자님이 주신 공간과 신뢰 덕분에 지금의 제가 있습니다. 감사합니다, 나그네방 💛',
+        name: '김태영',
+        message: '친구가 나그네방에서 지냈는데, 그 이후로 친구가 많이 달라졌어요. 사람과 함께 사는 것의 힘을 다시 생각하게 됐습니다. 이런 공간이 더 많아지면 좋겠어요.',
         photoURL: '',
         uid: 'seed-2',
         email: '',
         approved: true,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-02-14')),
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2025-12-18')),
       },
       {
-        name: '이웃 주민 최민준',
-        message: '동네에서 이런 공동체가 운영되고 있다는 게 얼마나 소중한지 모릅니다. 청년들이 서로 기대며 각자의 길을 찾아가는 모습이 아름다워요. 계속 응원하겠습니다!',
+        name: '박지은',
+        message: '7년이라는 시간이 정말 대단하게 느껴져요. 방 한 칸을 내어준다는 단순한 마음이 이렇게 많은 사람의 삶을 바꿔놨을 줄이야. 앞으로도 응원할게요 :)',
         photoURL: '',
         uid: 'seed-3',
         email: '',
         approved: true,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-01-22')),
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-01-07')),
       },
     ];
 
