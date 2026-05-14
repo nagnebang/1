@@ -25,3 +25,7 @@
 _____3.png
 images/docx-image*.jpg
 images/docx-image*.png
+
+# Local Netlify folder
+.netlify
+_원본자료/
