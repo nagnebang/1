@@ -330,6 +330,20 @@
     .org-node.hl .org-name { color: #fff; }
     .org-line { width: 1px; height: 20px; background: var(--tan); margin: 0 auto; opacity: .5; }
     .org-hline { height: 1px; background: var(--tan); opacity: .4; margin: 0 60px 0; position: relative; top: 20px; }
+
+    @media print {
+      html, body { overflow: visible; background: white; height: auto; }
+      .deck { height: auto; position: static; }
+      .slide {
+        display: flex !important;
+        position: relative; inset: auto;
+        width: 100%; height: 100vh;
+        page-break-after: always;
+        break-after: page;
+      }
+      .arrow, .nav-dots, .slide-num { display: none; }
+      .split { position: relative; height: 100vh; }
+    }
   </style>
 </head>
 <body>
@@ -504,6 +518,33 @@
   </div>
 
   <!-- ══════════════════════════════
+       5-1. 청년 주거 현실
+  ══════════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">왜 지금 나그네방인가</div>
+    <h2 class="center" style="margin-bottom: 6px;">서울 청년의 주거 현실</h2>
+    <p class="sub" style="font-size:12.5px; margin-bottom:28px;">2024 주거실태조사 기준</p>
+    <div class="g2" style="max-width: 860px; gap: 16px;">
+      <div class="card" style="border-left: 3px solid var(--teal); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">35.4<span style="font-size:22px;">%</span></div>
+        <div class="stat-l" style="margin-top:6px;">서울 청년 1인 가구가<br />소득 중 주거비로 지출<br /><span style="font-size:11px; color:var(--tan);">UN 권고 기준 30% 초과</span></div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--teal); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">60<span style="font-size:22px;">만원</span></div>
+        <div class="stat-l" style="margin-top:6px;">서울 지역 평균 월세<br />보증금 1,000만 원 이상 요구<br /><span style="font-size:11px; color:var(--tan);">자가점유율 12.2%에 불과</span></div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--tan); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">17.9<span style="font-size:22px;">%</span></div>
+        <div class="stat-l" style="margin-top:6px;">고시원 등 주택 이외 거처<br />거주 청년 비율<br /><span style="font-size:11px; color:var(--tan);">최저주거기준 미달 8.2%</span></div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--tan); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">69<span style="font-size:22px;">만</span></div>
+        <div class="stat-l" style="margin-top:6px;">주거 문제 경험 청년 가구<br />그 중 56%가 수도권 집중<br /><span style="font-size:11px; color:var(--tan);">이렇게 살면 독립이 가능할까요?</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
        6. 비전 & 미션
   ══════════════════════════════ -->
   <div class="slide bg-teal" data-dark="true">
@@ -637,6 +678,19 @@
       </table>
     </div>
     <p style="font-size: 11px; color: var(--ink2); margin-top: 12px; opacity: .7;">단위: 원 / 보조금·공모 제외 합산</p>
+    <div style="margin-top: 20px; max-width: 900px; width: 100%; background: white; border-radius: 12px; padding: 16px 24px; border-left: 3px solid var(--teal);">
+      <p style="font-size: 11px; font-weight: 700; letter-spacing:.08em; text-transform:uppercase; color: var(--teal); margin-bottom: 8px;">현재 운영 구조 (月 100만원)</p>
+      <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+        <span style="background: var(--cream); border-radius: 8px; padding: 6px 14px; font-size: 12px; color: var(--ink2);">나그네 책임비 <strong style="color:var(--ink);">40만원</strong></span>
+        <span style="font-size:12px; color:var(--tan); align-self:center;">+</span>
+        <span style="background: var(--cream); border-radius: 8px; padding: 6px 14px; font-size: 12px; color: var(--ink2);">히어아이엠 후원 <strong style="color:var(--ink);">40만원</strong></span>
+        <span style="font-size:12px; color:var(--tan); align-self:center;">+</span>
+        <span style="background: var(--cream); border-radius: 8px; padding: 6px 14px; font-size: 12px; color: var(--ink2);">개인 후원 <strong style="color:var(--ink);">20만원</strong></span>
+        <span style="font-size:12px; color:var(--tan); align-self:center;">=</span>
+        <span style="background: var(--teal); border-radius: 8px; padding: 6px 14px; font-size: 12px; color: white; font-weight: 700;">월 운영비 100만원</span>
+      </div>
+      <p style="font-size: 11px; color: var(--ink2); margin-top: 8px; opacity:.7;">월세·보증금 이자·공과금 포함 / 나그네 3인 거주 기준</p>
+    </div>
   </div>
 
   <!-- ══════════════════════════════
@@ -724,24 +778,29 @@
         <div class="org-node">
           <div class="org-role">이사</div>
           <div class="org-name">김예빈</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">나그네방의 처음을<br />함께 시작한 공동 창업자</div>
         </div>
         <div class="org-node">
           <div class="org-role">이사</div>
           <div class="org-name">김서연</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">오랫동안 나그네방을<br />후원해주신 지지자</div>
         </div>
         <div class="org-node">
           <div class="org-role">이사</div>
           <div class="org-name">김은득</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">나그네방의 공동체 철학을<br />마련해주신 목사님</div>
         </div>
         <div class="org-node">
           <div class="org-role">이사</div>
           <div class="org-name">안예지</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">오랫동안 나그네방을<br />후원해주신 지지자</div>
         </div>
       </div>
       <div class="org-row" style="gap: 12px; flex-wrap: wrap;">
         <div class="org-node" style="border-top: 2px solid var(--tan);">
           <div class="org-role" style="color: var(--tan);">감사</div>
           <div class="org-name">김별이</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">재정 전문가<br />건강한 재정 기반 마련</div>
         </div>
         <div class="org-node" style="border-top: 2px solid var(--tan); background: var(--cream);">
           <div class="org-role" style="color: var(--tan);">감사</div>
