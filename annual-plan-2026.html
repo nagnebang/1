@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나그네방 2026 연간계획</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --cream: #F3F1D9;
+      --tan:   #CAB099;
+      --teal:  #669999;
+      --sage:  #93A084;
+      --ink:   #1C1C1A;
+      --ink2:  #444440;
+      --white: #FDFAF3;
+      --serif: 'Noto Serif KR', serif;
+      --sans:  'Pretendard', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: var(--sans); }
+
+    .deck { width: 100%; height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 56px 72px;
+    }
+    .slide.active { display: flex; }
+
+    .bg-cream  { background: var(--cream); }
+    .bg-white  { background: var(--white); }
+    .bg-ink    { background: var(--ink); }
+    .bg-teal   { background: var(--teal); }
+    .bg-img    { background-size: cover; background-position: center; }
+    .bg-overlay::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(28,28,26,.62); z-index: 0;
+    }
+    .bg-overlay > * { position: relative; z-index: 1; }
+
+    .slide-tag {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: .13em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 18px;
+    }
+    .slide-tag.lt { color: rgba(255,255,255,.55); }
+    .slide-tag.wt { color: rgba(255,255,255,.8); }
+
+    h1 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.25; color: var(--ink); text-align: center;
+    }
+    h1.lt { color: #fff; }
+    h2 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(22px, 2.8vw, 38px);
+      line-height: 1.3; color: var(--ink);
+    }
+    h2.lt { color: #fff; }
+    h2.center { text-align: center; }
+    h3 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(16px, 1.8vw, 24px);
+      color: var(--ink); margin-bottom: 8px;
+    }
+    h3.lt { color: #fff; }
+
+    .sub {
+      font-size: clamp(13px, 1.3vw, 17px);
+      color: var(--ink2); line-height: 1.85;
+      text-align: center; margin-top: 18px;
+    }
+    .sub.lt { color: rgba(255,255,255,.75); }
+
+    p { font-size: clamp(12px, 1.15vw, 15px); color: var(--ink2); line-height: 1.85; }
+    p.lt { color: rgba(255,255,255,.8); }
+
+    .nav-dots {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 100;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(0,0,0,.18); border: none; cursor: pointer;
+      transition: background .25s, transform .25s;
+    }
+    .dot.dk { background: rgba(255,255,255,.28); }
+    .dot.active { background: var(--teal); transform: scale(1.5); }
+    .dot.dk.active { background: #fff; }
+
+    .arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,.15); backdrop-filter: blur(6px);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s; z-index: 100;
+    }
+    .arrow:hover { background: rgba(255,255,255,.3); }
+    .arrow.prev { left: 16px; }
+    .arrow.next { right: 16px; }
+    .arrow svg { width: 16px; height: 16px; }
+
+    .slide-num {
+      position: fixed; top: 20px; right: 28px;
+      font-size: 11px; color: rgba(0,0,0,.28);
+      font-weight: 600; z-index: 100;
+    }
+    .slide-num.lt { color: rgba(255,255,255,.32); }
+
+    .part-label {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: white;
+      background: var(--teal); border-radius: 40px;
+      padding: 5px 14px; margin-bottom: 20px;
+    }
+    .part-label.tan { background: var(--tan); }
+    .part-label.sage { background: var(--sage); }
+
+    .row  { display: flex; gap: 28px; width: 100%; align-items: flex-start; }
+    .col  { flex: 1; }
+    .g2   { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+    .g3   { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; width: 100%; }
+
+    .card { background: white; border-radius: 14px; padding: 24px 20px; box-shadow: 0 3px 16px rgba(0,0,0,.07); }
+    .card.cr  { background: var(--cream); box-shadow: none; }
+    .card.tnk { background: var(--ink); }
+
+    .clabel {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 8px;
+    }
+    .clabel.lt { color: rgba(255,255,255,.55); }
+
+    .stat { text-align: center; padding: 28px 16px; }
+    .stat-n {
+      font-family: var(--serif); font-size: clamp(40px, 5.5vw, 72px);
+      font-weight: 300; color: var(--teal); line-height: 1;
+    }
+    .stat-u { font-size: 13px; color: var(--tan); display: block; margin-top: 4px; }
+    .stat-l { font-size: 12px; color: var(--ink2); margin-top: 8px; line-height: 1.5; }
+
+    .quote {
+      font-family: var(--serif); font-size: clamp(17px, 2.1vw, 26px);
+      font-weight: 300; line-height: 1.75; color: var(--ink);
+      text-align: center; max-width: 720px; position: relative; padding: 0 20px;
+    }
+    .quote.lt { color: #fff; }
+    .quote::before {
+      content: '\201C'; font-size: 100px; line-height: 0;
+      position: absolute; top: 24px; left: -8px;
+      color: var(--tan); opacity: .35; font-family: Georgia, serif;
+    }
+
+    .div { width: 36px; height: 2px; background: var(--tan); margin: 20px auto; }
+    .div.lt { background: rgba(255,255,255,.2); }
+
+    .split {
+      display: grid; grid-template-columns: 1fr 1fr;
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+    }
+    .split-img {
+      background-size: cover; background-position: center;
+      position: relative;
+    }
+    .split-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(28,28,26,.15), transparent);
+    }
+    .split-body {
+      display: flex; flex-direction: column;
+      justify-content: center; padding: 60px 52px;
+      overflow-y: auto;
+    }
+
+    /* 목표 번호 뱃지 */
+    .goal-n {
+      font-family: var(--serif);
+      font-size: 64px; font-weight: 300;
+      color: var(--teal); opacity: .18;
+      position: absolute; top: 40px; right: 52px;
+      line-height: 1;
+    }
+
+    /* 불릿 리스트 */
+    .blist { list-style: none; padding: 0; margin-top: 16px; }
+    .blist li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: clamp(12px, 1.15vw, 14px);
+      color: var(--ink2); line-height: 1.75;
+      padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    .blist li:last-child { border-bottom: none; }
+    .blist li::before {
+      content: ''; flex-shrink: 0;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); margin-top: 8px;
+    }
+    .blist.lt li { color: rgba(255,255,255,.8); border-color: rgba(255,255,255,.08); }
+    .blist.lt li::before { background: rgba(255,255,255,.5); }
+
+    /* 월별 테이블 */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tbl th {
+      background: var(--ink); color: #fff;
+      padding: 9px 14px; text-align: left;
+      font-weight: 600; font-size: 11px; letter-spacing: .04em;
+    }
+    .tbl th:first-child { border-radius: 8px 0 0 0; }
+    .tbl th:last-child  { border-radius: 0 8px 0 0; }
+    .tbl td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,.06); color: var(--ink2); vertical-align: top; }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl .mo { font-weight: 700; color: var(--teal); white-space: nowrap; }
+    .tbl tr.highlight td { background: rgba(102,153,153,.08); }
+    .tbl tr.highlight .mo { color: var(--ink); }
+
+    /* 마일스톤 카드 */
+    .milestone {
+      border-radius: 16px; padding: 28px 32px;
+      position: relative; overflow: hidden;
+    }
+    .milestone.now { background: var(--teal); }
+    .milestone.next { background: var(--ink); }
+    .milestone-tag {
+      font-size: 9px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: rgba(255,255,255,.55);
+      margin-bottom: 10px;
+    }
+    .milestone h3 { color: #fff; font-size: 20px; margin-bottom: 8px; }
+    .milestone p { color: rgba(255,255,255,.75); font-size: 12.5px; line-height: 1.7; }
+
+    /* 생태계 노드 */
+    .eco-center {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: var(--teal); display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff; text-align: center; flex-shrink: 0;
+      box-shadow: 0 0 0 12px rgba(102,153,153,.15);
+    }
+    .eco-center span { font-family: var(--serif); font-size: 16px; font-weight: 400; }
+    .eco-center small { font-size: 9px; opacity: .7; margin-top: 2px; }
+
+    .eco-node {
+      background: white; border-radius: 12px; padding: 16px 18px;
+      box-shadow: 0 3px 14px rgba(0,0,0,.07); text-align: center;
+    }
+    .eco-node .en-icon { font-size: 22px; margin-bottom: 6px; }
+    .eco-node h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .eco-node p  { font-size: 11px; color: var(--ink2); line-height: 1.55; }
+
+    .eco-grid {
+      display: grid; grid-template-columns: 1fr 120px 1fr;
+      gap: 20px; width: 100%; align-items: center;
+    }
+    .eco-col { display: flex; flex-direction: column; gap: 12px; }
+
+    @media print {
+      html, body { overflow: visible; background: white; height: auto; }
+      .deck { height: auto; position: static; }
+      .slide {
+        display: flex !important; position: relative; inset: auto;
+        width: 100%; height: 100vh; page-break-after: always;
+      }
+      .arrow, .nav-dots, .slide-num { display: none; }
+      .split { position: relative; height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════════
+       1. 표지
+  ══════════════════════════════ -->
+  <div class="slide bg-img bg-overlay" data-dark="true"
+       style="background-image: url('images/bright-room.jpg');">
+    <div class="slide-tag wt">나그네방 · 2026</div>
+    <h1 class="lt" style="margin-bottom:14px; text-shadow: 0 2px 12px rgba(0,0,0,.4);">
+      연간 계획
+    </h1>
+    <div class="div lt"></div>
+    <p class="lt" style="text-align:center; font-size:15px; margin-top:0;">
+      우리 모두는 나그네이다<br />
+      <span style="color:rgba(255,255,255,.42); font-size:12px; margin-top:4px; display:block;"></span>
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════
+       2. 지난 협업의 기억
+  ══════════════════════════════ -->
+  <div class="slide" style="background:var(--white);">
+    <div class="split">
+      <div class="split-img" style="background-image: url('images/press-bake.jpg');"></div>
+      <div class="split-body">
+        <div class="part-label tan" style="margin-bottom:14px;">베이크와 나그네방</div>
+        <h2 style="margin-bottom:20px;">함께 만들어온 시간</h2>
+        <ul class="blist">
+          <li>VAB 프로젝트를 통한 나그네방 성장 — 커뮤니티 발표 사례로 소개</li>
+          <li>소셜임팩트 뉴스 기사 게재 — 나그네방의 이야기가 세상에 나오다</li>
+          <li>VAB 행사 · 생일 파티 · 오픈하우스 — 베이크와 함께 만든 자리들</li>
+          <li>베이커 74인의 공간이 된 나그네방</li>
+        </ul>
+        <div style="margin-top:22px; padding:14px 18px; background:var(--cream); border-radius:10px; border-left:3px solid var(--tan);">
+          <p style="font-size:12.5px; color:var(--ink); line-height:1.75;">이 자리가 있기까지<br /><strong>베이크 팀의 꾸준한 격려와 애정이 있었습니다.</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       3. 올해의 목표 3가지
+  ══════════════════════════════ -->
+  <div class="slide bg-cream">
+    <div class="slide-tag">2026 목표</div>
+    <h2 style="text-align:center; margin-bottom:36px;">올해 우리가 해낼 세 가지</h2>
+    <div class="g3" style="max-width:900px;">
+
+      <div class="card" style="border-top: 3px solid var(--teal); position:relative; overflow:hidden;">
+        <div style="font-family:var(--serif); font-size:48px; font-weight:300; color:var(--teal); opacity:.12; position:absolute; top:8px; right:16px; line-height:1;">1</div>
+        <div class="clabel">Goal 01</div>
+        <h3 style="font-size:16px; margin-bottom:8px;">비영리 법인 설립</h3>
+        <p style="font-size:12px;">사단법인 나그네방, 공식적인 이름을 얻다</p>
+      </div>
+
+      <div class="card" style="border-top: 3px solid var(--tan); position:relative; overflow:hidden;">
+        <div style="font-family:var(--serif); font-size:48px; font-weight:300; color:var(--tan); opacity:.18; position:absolute; top:8px; right:16px; line-height:1;">2</div>
+        <div class="clabel" style="color:var(--tan);">Goal 02</div>
+        <h3 style="font-size:16px; margin-bottom:8px;">지지자 커뮤니티</h3>
+        <p style="font-size:12px;">나그네들의 이야기가 살아 숨쉬는 생태계 만들기</p>
+      </div>
+
+      <div class="card" style="border-top: 3px solid var(--sage); position:relative; overflow:hidden;">
+        <div style="font-family:var(--serif); font-size:48px; font-weight:300; color:var(--sage); opacity:.18; position:absolute; top:8px; right:16px; line-height:1;">3</div>
+        <div class="clabel" style="color:var(--sage);">Goal 03</div>
+        <h3 style="font-size:16px; margin-bottom:8px;">존재 필요성 알리기</h3>
+        <p style="font-size:12px;">인터뷰, 콘텐츠, 협업으로 나그네방을 세상에</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       3. 목표 1 — 비영리 법인 설립
+  ══════════════════════════════ -->
+  <div class="slide bg-cream" style="padding: 48px 80px; align-items: flex-start;">
+    <div style="width:100%; max-width:860px; margin:0 auto;">
+      <div class="part-label" style="margin-bottom:14px;">Goal 01</div>
+      <h2 style="margin-bottom: 32px;">비영리 법인 설립</h2>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div class="card" style="border-left:3px solid var(--teal); border-radius:10px; padding:20px 22px;">
+          <div class="clabel">킥오프</div>
+          <p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:4px;">3월</p>
+          <p style="font-size:13px;">법인 설립 킥오프 미팅</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--teal); border-radius:10px; padding:20px 22px;">
+          <div class="clabel">사무총회</div>
+          <p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:4px;">5월 ★ 오늘</p>
+          <p style="font-size:13px;">이사·감사 섭외 완료 / 사무총회 진행</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--tan); border-radius:10px; padding:20px 22px;">
+          <div class="clabel" style="color:var(--tan);">법인 등기</div>
+          <p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:4px;">6월</p>
+          <p style="font-size:13px;">비영리 법인 설립 완료</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--tan); border-radius:10px; padding:20px 22px;">
+          <div class="clabel" style="color:var(--tan);">후원 모집</div>
+          <p style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:4px;">6월</p>
+          <p style="font-size:13px;">첫 정기 후원 인원 모집 시작</p>
+        </div>
+      </div>
+      <div style="padding: 16px 22px; background: var(--ink); border-radius: 10px;">
+        <p style="font-size: 13px; color: rgba(255,255,255,.9);">
+          <strong style="color:#fff;">다음 마일스톤 —</strong> 6월, 법인 등기 완료 & 첫 번째 정기 후원자를 맞이합니다
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       4. 커뮤니티 성격 — 페르소나
+  ══════════════════════════════ -->
+  <div class="slide bg-img bg-overlay" data-dark="true"
+       style="background-image: url('images/cafe-talk.jpg');">
+    <div class="slide-tag wt">Goal 02 · 나그네방 생태계</div>
+    <div class="quote lt" style="max-width:680px;">
+      우리 모두는 나그네이다.<br />
+      서로에게 자기만의 방을 만들어주자.
+    </div>
+    <div class="div lt"></div>
+    <div class="g3" style="max-width:780px; margin-top:8px;">
+      <div style="text-align:center; padding:16px;">
+        <p class="lt" style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.6; margin-bottom:6px;">페르소나</p>
+        <p class="lt" style="font-size:14px; font-weight:600;">다정하고<br />조건 없이 내어주는 존재</p>
+      </div>
+      <div style="text-align:center; padding:16px; border-left:1px solid rgba(255,255,255,.15); border-right:1px solid rgba(255,255,255,.15);">
+        <p class="lt" style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.6; margin-bottom:6px;">미감</p>
+        <p class="lt" style="font-size:14px; font-weight:600;">착하지 않고<br />재미있는</p>
+      </div>
+      <div style="text-align:center; padding:16px;">
+        <p class="lt" style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.6; margin-bottom:6px;">소통</p>
+        <p class="lt" style="font-size:14px; font-weight:600;">일방향이 아닌<br />쌍방향</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       5. 베이크와 나누고 싶은 이야기
+  ══════════════════════════════ -->
+  <div class="slide bg-cream" style="padding: 44px 72px; align-items: flex-start;">
+    <div style="width:100%; max-width:920px; margin:0 auto;">
+      <div class="part-label tan" style="margin-bottom:12px;">Goal 02 · 베이크와 함께</div>
+      <h2 style="margin-bottom: 28px;">베이크와 나누고 싶은 이야기</h2>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+
+        <div style="background:white; border-radius:12px; padding:20px 24px; display:flex; gap:20px; align-items:flex-start;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--teal); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">1</div>
+          <div>
+            <h3 style="font-size:15px; margin-bottom:8px;">나그네방이 필요한 일을 베이크를 통해</h3>
+            <ul class="blist" style="margin-top:0;">
+              <li style="font-size:12px;">운영자 1인 운영의 한계 — 지지자들의 역할이 필요한 시점</li>
+              <li style="font-size:12px;">비영리 법인 설립으로 이사·감사님들과 더 나은 방향 모색</li>
+              <li style="font-size:12px;">운영자 안동 상주 중 — 서울 나그네방 운영을 지지자들이 함께</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="background:white; border-radius:12px; padding:20px 24px; display:flex; gap:20px; align-items:flex-start;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--tan); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">2</div>
+          <div>
+            <h3 style="font-size:15px; margin-bottom:8px;">함께 만드는 자리를 계속</h3>
+            <p style="font-size:12px; color:var(--ink2); line-height:1.75;">VAB 행사를 통해 해왔던 <strong>생일 파티</strong>, <strong>오픈하우스</strong> 등 — 베이크와 함께 지속 운영</p>
+          </div>
+        </div>
+
+        <div style="background:white; border-radius:12px; padding:20px 24px; display:flex; gap:20px; align-items:flex-start;">
+          <div style="width:36px; height:36px; border-radius:50%; background:var(--sage); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;">3</div>
+          <div>
+            <h3 style="font-size:15px; margin-bottom:8px;">나그네방이 화자가 되는 콘텐츠</h3>
+            <p style="font-size:12px; color:var(--ink2); line-height:1.75;">운영자가 스피커가 아닌, <strong>나그네방</strong>이 스피커<br />나그네·전 나그네·후원자 모두가 이야기하는 재미나고 발칙한 콘텐츠</p>
+            <div style="margin-top:10px; display:inline-block; background:rgba(102,153,153,.12); border-radius:20px; padding:4px 14px;">
+              <p style="font-size:11.5px; color:var(--teal); font-weight:600;">월 1개 목표</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 핵심 질문 -->
+        <div style="background:var(--ink); border-radius:12px; padding:20px 24px;">
+          <p style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:10px;">베이크와 함께 고민해보고 싶어요.</p>
+          <h3 style="font-size:16px; color:#fff; margin-bottom:12px; font-family:var(--serif); font-weight:400; line-height:1.5;">나그네와 지지자 사이의 유대감(관계성)을<br />어떻게 만들 것인가?</h3>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       6. 목표 2 — 커뮤니티 구성원
+  ══════════════════════════════ -->
+  <div class="slide bg-cream" style="padding: 40px 64px; align-items: flex-start;">
+    <div style="width:100%; max-width:960px; margin:0 auto;">
+      <div class="part-label tan" style="margin-bottom:10px;">Goal 02 · 나그네방 생태계</div>
+      <h2 style="margin-bottom: 4px;">나그네방 가치에 공감하는 사람들의 생태계</h2>
+      <p style="margin-bottom:22px; font-size:13px; color:var(--ink2);">이건 후원자 커뮤니티가 아니다</p>
+
+      <!-- 배경 / 문제의식 -->
+      <div style="background:white; border-radius:12px; padding:14px 22px; margin-bottom:20px; border-left:3px solid var(--tan); display:flex; gap:32px; align-items:center;">
+        <div style="flex:1;">
+          <div class="clabel" style="color:var(--tan);">지금까지</div>
+          <p style="font-size:13px; font-weight:600; color:var(--ink2);">운영자 1인 + 베이커 74인<br /><span style="font-weight:400; font-size:12px;">비정기 소식 업로드 / 오프라인 소통은 있으나 온라인 소통 없음</span></p>
+        </div>
+        <div style="color:var(--tan); font-size:22px; flex-shrink:0;">→</div>
+        <div style="flex:1;">
+          <div class="clabel">앞으로</div>
+          <p style="font-size:13px; font-weight:600; color:var(--ink);">나그네방의 가치를 공감한 이들의 연결</p>
+        </div>
+      </div>
+
+      <!-- 구성원 3유형 -->
+      <div class="g3" style="gap:14px;">
+        <div class="card" style="border-top:3px solid var(--ink); padding:18px 18px;">
+          <div class="clabel" style="color:var(--ink);">기둥 · 고관여</div>
+          <h3 style="font-size:15px; margin-bottom:10px;">구조를 함께<br />세우는 사람</h3>
+          <ul class="blist" style="margin-top:0;">
+            <li style="font-size:11.5px;">이사·감사 — 법인 안에 함께</li>
+            <li style="font-size:11.5px;">사업·공모전 정보 연결</li>
+            <li style="font-size:11.5px;">방향 논의의 동반자</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top:3px solid var(--teal); padding:18px 18px;">
+          <div class="clabel">열쇠 · 저관여</div>
+          <h3 style="font-size:15px; margin-bottom:10px;">문을 열어주는<br />사람</h3>
+          <ul class="blist" style="margin-top:0;">
+            <li style="font-size:11.5px;">정기 후원으로 존재를 가능케</li>
+            <li style="font-size:11.5px;">부동산·조력자 네트워크</li>
+            <li style="font-size:11.5px;">나그네방 이야기를 퍼뜨리는</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top:3px solid var(--sage); padding:18px 18px;">
+          <div class="clabel" style="color:var(--sage);">나그네 · 당사자</div>
+          <h3 style="font-size:15px; margin-bottom:10px;">살아본 사람,<br />이야기를 남기는</h3>
+          <ul class="blist" style="margin-top:0;">
+            <li style="font-size:11.5px;">현재 입주자 · 졸업 나그네</li>
+            <li style="font-size:11.5px;">나그네방만의 솔직한 기록</li>
+            <li style="font-size:11.5px;">다음 나그네에게 쓰는 편지</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       7. 목표 2 — 무엇이 오고가는가
+  ══════════════════════════════ -->
+  <div class="slide" style="background:var(--white); padding:40px 64px; align-items:flex-start;">
+    <div style="width:100%; max-width:960px; margin:0 auto;">
+      <div class="part-label tan" style="margin-bottom:10px;">Goal 02 · 콘텐츠 흐름</div>
+      <h2 style="margin-bottom:24px;">커뮤니티에서 무엇이 오고가는가</h2>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+
+        <div style="background:var(--cream); border-radius:12px; padding:18px 20px;">
+          <div class="clabel">채널 1</div>
+          <h3 style="font-size:14px; margin-bottom:10px;">나그네방에서 생활하는 법</h3>
+          <p style="font-size:12px; color:var(--ink2);">역대 나그네들이 직접 쓰는 에세이</p>
+          <p style="font-size:12px; color:var(--teal); margin-top:8px; font-style:italic; line-height:1.6;">"싸우기 시작했다면<br />드디어 함께 살기 시작한 것"</p>
+        </div>
+
+        <div style="background:var(--cream); border-radius:12px; padding:18px 20px;">
+          <div class="clabel">채널 2</div>
+          <h3 style="font-size:14px; margin-bottom:10px;">서로를 향한 편지</h3>
+          <ul class="blist" style="margin-top:0;">
+            <li style="font-size:11.5px;">나그네 → 다음 나그네에게</li>
+            <li style="font-size:11.5px;">후원자 → 입주자에게</li>
+            <li style="font-size:11.5px;">운영자 → 지지자들에게</li>
+          </ul>
+        </div>
+
+        <div style="background:var(--cream); border-radius:12px; padding:18px 20px;">
+          <div class="clabel">채널 3</div>
+          <h3 style="font-size:14px; margin-bottom:10px;">나그네방 100개 만들기</h3>
+          <ul class="blist" style="margin-top:0;">
+            <li style="font-size:11.5px;">운영 과정의 날것 기록</li>
+            <li style="font-size:11.5px;">주거 아이디어·정보 공유</li>
+            <li style="font-size:11.5px;">나그네방 모델을 만들고 싶은 이들의 글</li>
+          </ul>
+        </div>
+
+        <div style="background:var(--cream); border-radius:12px; padding:18px 20px;">
+          <div class="clabel">채널 4</div>
+          <h3 style="font-size:14px; margin-bottom:10px;">날것의 이미지와 순간</h3>
+          <p style="font-size:12px; color:var(--ink2); line-height:1.7;">정제하지 않은 사진들<br />함께 먹은 밥, 싸운 이야기, 웃은 순간</p>
+          <p style="font-size:11.5px; color:var(--teal); margin-top:8px;">착하지 않고, 재미있는</p>
+        </div>
+
+      </div>
+
+      <div style="margin-top:16px; padding:14px 20px; background:var(--ink); border-radius:10px; display:flex; align-items:center; gap:20px;">
+        <p style="color:rgba(255,255,255,.5); font-size:11px; white-space:nowrap;">소통 방향</p>
+        <div style="flex:1; display:flex; align-items:center; gap:10px; justify-content:center;">
+          <span style="color:rgba(255,255,255,.4); font-size:12px; text-decoration:line-through;">나그네방 → 70명</span>
+          <span style="color:var(--tan); font-size:18px; margin:0 4px;">→</span>
+          <span style="color:#fff; font-size:13px; font-weight:600;">나그네방 ⇄ 지지자 ⇄ 나그네 ⇄ 조력자</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       6. 목표 3 — 존재 필요성 알리기
+  ══════════════════════════════ -->
+  <div class="slide" style="background: var(--white);">
+    <div class="split">
+      <div class="split-body" style="background: var(--ink);">
+        <div class="part-label sage">Goal 03</div>
+        <h2 class="lt" style="margin-bottom: 20px;">나그네방의<br />존재 필요성 알리기</h2>
+        <ul class="blist lt">
+          <li>입주자(나그네) 인터뷰 제작 — "나에게 나그네방 경험은 어떤 시간이었나"</li>
+          <li>성북동 콘텐츠 발행 — 돌고돌아성북천 또는 지역 매거진 협업</li>
+          <li>베이크 조직들과 협업 프로젝트</li>
+          <li>6월 — 나그네 3인 인터뷰 릴리즈</li>
+        </ul>
+      </div>
+      <div class="split-img" style="background-image: url('images/laughing-together.jpg');"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       7. 월별 계획
+  ══════════════════════════════ -->
+  <div class="slide bg-cream" style="padding: 40px 64px;">
+    <div class="slide-tag">2026 로드맵</div>
+    <h2 class="center" style="margin-bottom:8px; font-size:clamp(18px,2.2vw,30px);">월별 계획</h2>
+    <p style="text-align:center; font-size:12px; color:var(--ink2); margin-bottom:20px;">대내 활동 대부분은 베이크 온라인 커뮤니티 안에서 이루어집니다</p>
+    <table class="tbl" style="max-width:900px;">
+      <thead>
+        <tr>
+          <th style="width:72px;">월</th>
+          <th>대외</th>
+          <th>대내</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mo">1월</td>
+          <td>안동 나그네방 오픈 · Vake 펀딩 참여자 안동 방문</td>
+          <td>나그네 2인 독립, 1인 입주</td>
+        </tr>
+        <tr>
+          <td class="mo">2월</td>
+          <td>안동 나그네방 사업화 실험 시작 · 펀딩 참여자 지속 방문</td>
+          <td>나그네 1인 입주</td>
+        </tr>
+        <tr>
+          <td class="mo">3월</td>
+          <td>나그네방 비영리 법인 킥오프 미팅</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mo">4월</td>
+          <td>안동 숙박업 사업자 취득</td>
+          <td>—</td>
+        </tr>
+        <tr class="highlight">
+          <td class="mo" style="color:var(--teal); font-weight:800;">5월 ★</td>
+          <td>이사·감사 섭외 완료 / <strong>사무총회 진행</strong></td>
+          <td>베이크 온라인 커뮤니티 기획 · 웹사이트 제작</td>
+        </tr>
+        <tr class="highlight">
+          <td class="mo" style="color:var(--teal); font-weight:800;">6월 ★</td>
+          <td><strong>비영리 법인 설립 · 첫 정기 후원 인원 모집</strong></td>
+          <td>나그네 3인 인터뷰 릴리즈</td>
+        </tr>
+        <tr>
+          <td class="mo">7–8월</td>
+          <td>지역 콘텐츠 발행 / 베이크 협업 실험</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mo">9월</td>
+          <td>8주년 생일 파티 🎂</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td class="mo">10–12월</td>
+          <td colspan="2" style="color:var(--ink2); font-style:italic;">미정 — 상반기 성과를 보며 채워갑니다</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════
+       8. 다음 마일스톤
+  ══════════════════════════════ -->
+  <div class="slide bg-img bg-overlay" data-dark="true"
+       style="background-image: url('images/living-space.jpeg');">
+    <div class="slide-tag wt">Next Milestone</div>
+    <h2 class="lt center" style="margin-bottom: 36px;">지금 여기, 다음 걸음</h2>
+    <div class="g2" style="max-width:780px; gap:20px;">
+
+      <div class="milestone now">
+        <div class="milestone-tag">지금 · 2026년 5월</div>
+        <h3>사무총회</h3>
+        <p>이사·감사 여러분과 함께<br />나그네방의 공식 시작을 열다</p>
+      </div>
+
+      <div class="milestone next">
+        <div class="milestone-tag">다음 · 2026년 6월</div>
+        <h3>법인 설립<br />+ 정기 후원자 모집</h3>
+        <p>사단법인으로서 첫 발을 내딛고<br />나그네방을 함께 세울 사람들을 초대합니다</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       9. 마무리
+  ══════════════════════════════ -->
+  <div class="slide bg-img bg-overlay" data-dark="true"
+       style="background-image: url('images/meal-together2.jpeg');">
+    <img src="images/logo-transparent.png"
+         style="height:48px; margin-bottom:24px; filter:brightness(0) invert(1); opacity:.85;" alt="나그네방 로고" />
+    <div class="quote lt" style="font-size:clamp(16px,1.9vw,24px); max-width:600px;">
+      꾸준한 격려와 애정, 감사합니다.<br />
+      나그네방이 이만큼 성장한 건<br />온전히 베이크 팀 덕분이에요.
+    </div>
+    <div class="div lt"></div>
+    <p class="lt" style="text-align:center; font-size:13px; opacity:.55;">
+      나그네방 · 2026
+    </p>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── NAV ── -->
+<div class="nav-dots" id="dots"></div>
+<button class="arrow prev" id="prev" aria-label="이전">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+</button>
+<button class="arrow next" id="next" aria-label="다음">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+</button>
+<div class="slide-num" id="snum"></div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl = document.getElementById('dots');
+  const snum   = document.getElementById('snum');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot';
+    d.setAttribute('aria-label', `슬라이드 ${i+1}`);
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    const s = slides[cur];
+    s.classList.add('active');
+    const dark = s.dataset.dark;
+    document.querySelectorAll('.dot').forEach((d,i) => {
+      d.className = 'dot' + (dark ? ' dk' : '') + (i===cur ? ' active' : '');
+    });
+    ['prev','next'].forEach(id => {
+      const btn = document.getElementById(id);
+      btn.style.color = dark ? '#fff' : '#333';
+    });
+    snum.className = 'slide-num' + (dark ? ' lt' : '');
+    snum.textContent = `${cur+1} / ${slides.length}`;
+  }
+
+  document.getElementById('prev').onclick = () => go(cur - 1);
+  document.getElementById('next').onclick = () => go(cur + 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(cur - 1);
+  });
+
+  go(0);
+</script>
+</body>
+</html>
