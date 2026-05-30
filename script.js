@@ -264,7 +264,7 @@ document.addEventListener('keydown', e => {
 // ─── COPY ACCOUNT ───
 const toast = document.getElementById('toast');
 function copyAccount() {
-  const acc = '3333255616854';
+  const acc = '55391000261705';
   if (navigator.clipboard) navigator.clipboard.writeText(acc);
   else {
     const t = document.createElement('textarea');
