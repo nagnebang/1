@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나그네방 — EoC 발제</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --cream: #F3F1D9;
+      --tan:   #CAB099;
+      --teal:  #669999;
+      --sage:  #93A084;
+      --ink:   #1C1C1A;
+      --ink2:  #444440;
+      --white: #FDFAF3;
+      --serif: 'Noto Serif KR', serif;
+      --sans:  'Pretendard', sans-serif;
+      --rule:  rgba(0,0,0,.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: var(--sans); }
+
+    /* ── DECK ── */
+    .deck { width: 100%; height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 56px 72px;
+    }
+    .slide.active { display: flex; }
+
+    /* ── BACKGROUNDS ── */
+    .bg-cream { background: var(--cream); }
+    .bg-white { background: var(--white); }
+    .bg-ink   { background: var(--ink); }
+    .bg-teal  { background: var(--teal); }
+    .bg-img   { background-size: cover; background-position: center; }
+    .bg-overlay::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(28,28,26,.65); z-index: 0;
+    }
+    .bg-overlay > * { position: relative; z-index: 1; }
+
+    /* ── TYPE ── */
+    .slide-tag {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 18px;
+    }
+    .slide-tag.lt { color: rgba(255,255,255,.5); }
+    .slide-tag.wt { color: rgba(255,255,255,.8); }
+
+    h1 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.25; color: var(--ink); text-align: center;
+    }
+    h1.lt { color: #fff; }
+    h2 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(22px, 2.8vw, 38px);
+      line-height: 1.3; color: var(--ink);
+    }
+    h2.lt  { color: #fff; }
+    h2.ctr { text-align: center; }
+    h3 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(16px, 1.8vw, 24px);
+      color: var(--ink); margin-bottom: 8px;
+    }
+    h3.lt { color: #fff; }
+    .sub {
+      font-size: clamp(13px, 1.3vw, 17px);
+      color: var(--ink2); line-height: 1.85;
+      text-align: center; margin-top: 18px;
+    }
+    .sub.lt { color: rgba(255,255,255,.7); }
+    p { font-size: clamp(12px, 1.15vw, 15px); color: var(--ink2); line-height: 1.85; }
+    p.lt { color: rgba(255,255,255,.78); }
+
+    /* ── NAV ── */
+    .nav-dots {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 100;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(0,0,0,.18); border: none; cursor: pointer;
+      transition: background .25s, transform .25s;
+    }
+    .dot.dk  { background: rgba(255,255,255,.28); }
+    .dot.active { background: var(--teal); transform: scale(1.5); }
+    .dot.dk.active { background: #fff; }
+
+    .arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,.13); backdrop-filter: blur(6px);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s; z-index: 100;
+    }
+    .arrow:hover { background: rgba(255,255,255,.28); }
+    .arrow.prev { left: 16px; }
+    .arrow.next { right: 16px; }
+    .arrow svg  { width: 16px; height: 16px; }
+    .slide-num {
+      position: fixed; top: 20px; right: 28px;
+      font-size: 11px; color: rgba(0,0,0,.24);
+      font-weight: 600; z-index: 100;
+    }
+    .slide-num.lt { color: rgba(255,255,255,.28); }
+
+    /* ── LAYOUT ── */
+    .g2  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+    .g3  { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; width: 100%; }
+    .g4  { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; width: 100%; }
+
+    /* ── CARDS ── */
+    .card { background: white; border-radius: 14px; padding: 24px 20px; box-shadow: 0 3px 16px rgba(0,0,0,.07); }
+
+    /* ── DIVIDER ── */
+    .div { width: 36px; height: 2px; background: var(--tan); margin: 20px auto; }
+    .div.lt { background: rgba(255,255,255,.2); }
+
+    /* ── SPLIT (image + content) ── */
+    .split {
+      display: grid; grid-template-columns: 1fr 1fr;
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+    }
+    .split-img {
+      background-size: cover; background-position: center; position: relative;
+    }
+    .split-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(28,28,26,.15), transparent);
+    }
+    .split-body {
+      display: flex; flex-direction: column;
+      justify-content: center; padding: 60px 52px;
+      overflow-y: auto;
+    }
+
+    /* ── QUOTE ── */
+    .quote {
+      font-family: var(--serif); font-size: clamp(17px, 2.1vw, 26px);
+      font-weight: 300; line-height: 1.75; color: var(--ink);
+      text-align: center; max-width: 720px; position: relative; padding: 0 20px;
+    }
+    .quote.lt { color: #fff; }
+    .quote::before {
+      content: '\201C'; font-size: 100px; line-height: 0;
+      position: absolute; top: 24px; left: -8px;
+      color: var(--tan); opacity: .35; font-family: Georgia, serif;
+    }
+
+    /* ── STAT ── */
+    .stat-n {
+      font-family: var(--serif); font-size: clamp(40px, 5.5vw, 68px);
+      font-weight: 300; color: var(--teal); line-height: 1;
+    }
+    .stat-l { font-size: 12px; color: var(--ink2); margin-top: 8px; line-height: 1.5; }
+
+    /* ── TIMELINE (horizontal) ── */
+    .htl { display: flex; flex-direction: column; gap: 0; }
+    .htl-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding-bottom: 16px; position: relative;
+    }
+    .htl-item::before {
+      content: ''; position: absolute; left: 31px; top: 30px;
+      width: 1px; height: calc(100% - 12px);
+      background: var(--tan); opacity: .4;
+    }
+    .htl-item:last-child::before { display: none; }
+    .htl-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--teal); flex-shrink: 0;
+      margin-top: 4px; margin-left: 27px;
+    }
+    .htl-yr {
+      width: 44px; font-family: var(--serif); font-size: 14px;
+      font-weight: 300; color: var(--teal); flex-shrink: 0; padding-top: 0;
+      text-align: right;
+    }
+    .htl-text h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .htl-text p  { font-size: 11.5px; color: var(--ink2); line-height: 1.6; }
+
+    /* ── PRINCIPLE ── */
+    .p-item {
+      display: flex; gap: 18px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid var(--rule);
+    }
+    .p-item:last-child { border-bottom: none; }
+    .p-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--teal); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+    .p-label { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .p-desc  { font-size: 12px; color: var(--ink2); line-height: 1.65; }
+
+    /* ── VALUE ITEM ── */
+    .v-item {
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .v-icon { font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+    .v-label { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .v-desc  { font-size: 12px; color: var(--ink2); line-height: 1.6; margin: 0; }
+
+    /* ── PRINT ── */
+    @media print {
+      html, body { overflow: visible; background: white; height: auto; }
+      .deck { height: auto; position: static; }
+      .slide {
+        display: flex !important;
+        position: relative; inset: auto;
+        width: 100%; height: 100vh;
+        page-break-after: always; break-after: page;
+      }
+      .arrow, .nav-dots, .slide-num { display: none; }
+      .split { position: relative; height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════
+       1. 표지 — 나그네방 소개
+  ══════════════════════════ -->
+  <div class="slide bg-img bg-overlay" data-dark="true"
+       style="background-image: url('images/gathering.jpeg');">
+    <div class="slide-tag wt">Economy of Communion — 나눔의 경제</div>
+    <h1 class="lt" style="margin-bottom:14px; text-shadow: 0 2px 14px rgba(0,0,0,.5);">
+      나그네방
+    </h1>
+    <div class="div lt"></div>
+    <p class="lt" style="text-align:center; font-size:16px; margin-top:0; line-height:2;">
+      기댈 곳이 필요한 이들의 도심 속 안식처<br />
+      <span style="color:rgba(255,255,255,.45); font-size:12px; display:block; margin-top:6px;">대표 유하영 · Here I Am(히어아이엠)</span>
+    </p>
+  </div>
+
+  <!-- ══════════════════════════
+       2. 히어아이엠 소개
+  ══════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split">
+      <div class="split-img" style="background-image: url('images/meal-together.jpg');"></div>
+      <div class="split-body bg-white">
+        <div class="slide-tag">히어아이엠 소개</div>
+        <h2 style="margin-bottom:6px;">Here I Am<br /><span style="font-size:.6em; color:var(--ink2); font-family:var(--sans); font-weight:400;">"나 여기 있습니다"</span></h2>
+        <p style="font-size:12.5px; color:var(--ink2); margin:16px 0 26px; line-height:1.85;">
+          히어아이엠은 나그네방을 운영하는 비영리 공동체입니다.<br />
+          내가 가진 것 중 '필요 이상의 것'을 이웃과 나누는 삶의 방식을 실험하며,
+          <strong>공유 주거·로컬 숙소·커뮤니티 운영</strong>을 통해 지속가능한 나눔의 경제를 만들어가고 있습니다.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:12px 16px; background:var(--cream); border-radius:10px;">
+            <span style="font-size:18px;">🏘️</span>
+            <div>
+              <div style="font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:2px;">나그네방 운영</div>
+              <p style="font-size:11.5px; color:var(--ink2); margin:0; line-height:1.6;">서울 성북동 — 청년 공유 주거</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:12px 16px; background:var(--cream); border-radius:10px;">
+            <span style="font-size:18px;">🏨</span>
+            <div>
+              <div style="font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:2px;">코이노니아 스테이 운영</div>
+              <p style="font-size:11.5px; color:var(--ink2); margin:0; line-height:1.6;">경북 안동 — 여행자 숙소 · 수익 전액 → 나그네방</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:12px 16px; background:var(--cream); border-radius:10px;">
+            <span style="font-size:18px;">💛</span>
+            <div>
+              <div style="font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:2px;">후원 네트워크</div>
+              <p style="font-size:11.5px; color:var(--ink2); margin:0; line-height:1.6;">개인 정기 후원자 · 기업 사회공헌 · 커뮤니티</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       3. 히어아이엠의 문제의식
+  ══════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">히어아이엠의 문제의식</div>
+    <div style="max-width: 820px; width: 100%; text-align: center;">
+      <p style="font-size: clamp(20px, 2.4vw, 30px); font-family: var(--serif); font-weight: 300; color: #fff; line-height: 1.8; margin-bottom: 36px;">
+        "이 방은 우리 것이 아닌 것 같다.<br />방이 필요한 사람에게 내어주자."
+      </p>
+      <p style="font-size: 12px; color: rgba(255,255,255,.4); letter-spacing: .08em; margin-bottom: 44px;">— 2018년 여름, 나그네방의 시작</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left;">
+        <div style="background: rgba(255,255,255,.06); border-radius: 14px; padding: 22px 20px; border-top: 2px solid var(--teal);">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--teal); margin-bottom: 10px;">질문</div>
+          <p style="font-size: 13px; color: rgba(255,255,255,.85); line-height: 1.8; margin: 0;">
+            내가 필요한 것 이상을 갖고 있다면,<br />
+            그 나머지는 진짜 내 것인가?
+          </p>
+        </div>
+        <div style="background: rgba(255,255,255,.06); border-radius: 14px; padding: 22px 20px; border-top: 2px solid var(--tan);">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--tan); margin-bottom: 10px;">태도</div>
+          <p style="font-size: 13px; color: rgba(255,255,255,.85); line-height: 1.8; margin: 0;">
+            "이용당하면 되죠."<br />
+            <span style="font-size: 11.5px; color: rgba(255,255,255,.45);">— 유하영 대표, EoC 아르헨티나 콘퍼런스</span>
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; padding: 18px 28px; background: rgba(102,153,153,.18); border-radius: 12px; border: 1px solid rgba(102,153,153,.3);">
+        <p style="font-size: 13.5px; color: rgba(255,255,255,.8); line-height: 1.85; margin: 0;">
+          주는 것을 먼저, 계산은 나중에 — 그것이 나그네방이 지금까지 버텨온 방식입니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       4. 나그네방의 문제의식: 사회문제
+  ══════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">나그네방의 문제의식</div>
+    <h2 class="ctr" style="margin-bottom: 6px;">서울 청년의 주거 현실</h2>
+    <p style="text-align:center; font-size:12px; color:var(--ink2); margin-bottom:28px;">2024 주거실태조사 기준</p>
+
+    <div class="g4" style="max-width: 900px;">
+      <div class="card" style="text-align:center; border-top: 3px solid var(--teal); padding: 22px 14px;">
+        <div class="stat-n" style="font-size: clamp(34px, 4vw, 52px);">35.4<span style="font-size:.5em;">%</span></div>
+        <div class="stat-l">소득 대비 주거비 지출<br /><span style="font-size:10.5px; color:var(--tan);">UN 권고 30% 초과</span></div>
+      </div>
+      <div class="card" style="text-align:center; border-top: 3px solid var(--teal); padding: 22px 14px;">
+        <div class="stat-n" style="font-size: clamp(34px, 4vw, 52px);">60<span style="font-size:.45em; letter-spacing:-.02em;">만원</span></div>
+        <div class="stat-l">서울 평균 월세<br /><span style="font-size:10.5px; color:var(--tan);">보증금 1,000만원 이상</span></div>
+      </div>
+      <div class="card" style="text-align:center; border-top: 3px solid var(--tan); padding: 22px 14px;">
+        <div class="stat-n" style="font-size: clamp(34px, 4vw, 52px);">17.9<span style="font-size:.5em;">%</span></div>
+        <div class="stat-l">고시원 등 주택 외 거처<br /><span style="font-size:10.5px; color:var(--tan);">최저주거기준 미달 8.2%</span></div>
+      </div>
+      <div class="card" style="text-align:center; border-top: 3px solid var(--tan); padding: 22px 14px;">
+        <div class="stat-n" style="font-size: clamp(34px, 4vw, 52px);">69<span style="font-size:.45em;">만</span></div>
+        <div class="stat-l">주거문제 경험 청년 가구<br /><span style="font-size:10.5px; color:var(--tan);">56%가 수도권 집중</span></div>
+      </div>
+    </div>
+
+    <div style="max-width: 900px; width: 100%; margin-top: 20px; padding: 16px 24px; background: var(--cream); border-radius: 12px; text-align: center;">
+      <p style="font-size: 13.5px; color: var(--ink); line-height: 1.8; margin: 0;">
+        이런 환경 속에서 청년이 <strong>'온전히 살아간다'</strong>는 것은 무엇을 의미할까요?<br />
+        나그네방은 그 질문에 대한 <strong style="color: var(--teal);">한 가지 대답</strong>입니다.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       5. 나그네방 연혁
+  ══════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split">
+      <div class="split-img" style="background-image: url('images/living-space.jpeg');"></div>
+      <div class="split-body bg-cream">
+        <div class="slide-tag">나그네방 연혁</div>
+        <h2 style="margin-bottom: 8px;">방 문은 한 번도<br />닫힌 적이 없었습니다</h2>
+        <p style="font-size: 12px; color: var(--ink2); margin-bottom: 26px; line-height: 1.7;">7년 · 4개 거점 · 40여 명의 청년</p>
+
+        <div class="htl">
+          <div class="htl-item">
+            <span class="htl-yr">2018</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 구로구 오류동</h4>
+              <p>두 청년이 남은 방 하나를 내어주며 시작됐습니다. 나그네 5명.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr">2020</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 용산구</h4>
+              <p>이사하면서도 방 문은 닫히지 않았습니다. 나그네 6명.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr">2022</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 성북구 보문동</h4>
+              <p>외국인 입주자도 함께하기 시작했습니다. 나그네 12명.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr">2024</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 성북구 성북동 정착</h4>
+              <p>성북동을 영구 거점으로. 비영리 법인 준비 시작.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr" style="color: var(--tan);">2026</span>
+            <div class="htl-dot" style="background: var(--tan);"></div>
+            <div class="htl-text">
+              <h4>안동 코이노니아 스테이 오픈 + 법인 설립</h4>
+              <p>영리 수익이 비영리를 지탱하는 구조의 첫 실험.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       6. 나그네방 원칙
+  ══════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">나그네방 원칙</div>
+    <h2 class="ctr" style="margin-bottom: 32px;">함께 사는 방식</h2>
+
+    <div style="max-width: 840px; width: 100%; display: flex; flex-direction: column; gap: 0;">
+      <div class="p-item">
+        <div class="p-num">1</div>
+        <div>
+          <div class="p-label">경제 원칙</div>
+          <p class="p-desc">보증금은 운영자가 전액 부담합니다. 나그네는 수입의 10%를 책임비로 냅니다. 수입이 없으면 최소 20만 원, 정말 어렵다면 재능으로 대체할 수 있어요.</p>
+        </div>
+      </div>
+      <div class="p-item">
+        <div class="p-num">2</div>
+        <div>
+          <div class="p-label">생활 원칙</div>
+          <p class="p-desc">기본 가구와 가전을 모두 갖춰드립니다. 공용 공간의 물건이나 냉장고 속 음식은 모두 함께 씁니다. 있는 것은 나눠 씁니다.</p>
+        </div>
+      </div>
+      <div class="p-item">
+        <div class="p-num">3</div>
+        <div>
+          <div class="p-label">마음가짐</div>
+          <p class="p-desc">이 방이 더 필요한 사람이 나타나면, 기꺼이 자리를 내어줄 수 있는 마음을 부탁드려요. 나그네방은 머무는 곳이 아니라, 다음을 준비하는 곳이니까요.</p>
+        </div>
+      </div>
+      <div class="p-item">
+        <div class="p-num">4</div>
+        <div>
+          <div class="p-label">커뮤니티</div>
+          <p class="p-desc">느슨하지만 온기 있는 관계를 소중히 여깁니다. 운영자와 나그네, 후원자 모두가 서로를 기억하고 살핍니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 22px; max-width: 840px; width: 100%; padding: 14px 22px; background: var(--cream); border-radius: 10px; text-align: center;">
+      <p style="font-size: 12.5px; color: var(--teal); font-weight: 600; margin: 0;">계약서도, 보증금도 없습니다. 신뢰가 계약서를 대신합니다.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       7. 나그네방 가치, 이야기
+  ══════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split" style="flex-direction: row-reverse;">
+      <div class="split-img" style="background-image: url('images/laughing-together.jpg'); background-position: center;"></div>
+      <div class="split-body bg-cream">
+        <div class="slide-tag">나그네방 가치 & 이야기</div>
+        <h2 style="margin-bottom: 6px;">이 안에서<br />달라지는 것들</h2>
+        <p style="font-size: 12px; color: var(--ink2); margin-bottom: 24px; line-height: 1.7;">청년 3명이 함께 살며 경험한 변화</p>
+
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px;">
+          <div class="v-item">
+            <span class="v-icon">🏠</span>
+            <div>
+              <div class="v-label">안전한 주거 기반</div>
+              <p class="v-desc">계약서도 보증금도 없이, 각자의 속도로 자립을 준비하는 공간</p>
+            </div>
+          </div>
+          <div class="v-item">
+            <span class="v-icon">💛</span>
+            <div>
+              <div class="v-label">삶의 품질 회복</div>
+              <p class="v-desc">아낀 주거비로 먹고 입고 배우는 일에 — 사람답게 사는 일</p>
+            </div>
+          </div>
+          <div class="v-item">
+            <span class="v-icon">🤝</span>
+            <div>
+              <div class="v-label">관계와 공동체</div>
+              <p class="v-desc">가족 관계의 회복, 각자도생 시대에 기댈 곳이 있다는 감각</p>
+            </div>
+          </div>
+          <div class="v-item">
+            <span class="v-icon">🌱</span>
+            <div>
+              <div class="v-label">한 사람의 성숙</div>
+              <p class="v-desc">함께 사는 법을 몸으로 익히는 것 — 어렵지만 가장 가치 있는 일</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 14px 18px; background: rgba(202,176,153,.2); border-radius: 10px; border-left: 3px solid var(--tan);">
+          <p style="font-size: 12px; color: var(--ink2); line-height: 1.8; margin: 0; font-style: italic;">
+            "졸업 후 자립을 준비하던 시기, 나그네방의 문을 두드렸습니다.<br />잠시 머물렀다 가지만, 참 정이 많이 들었어요."<br />
+            <span style="font-size: 11px; color: var(--tan); font-style: normal;">— 나그네 무나민</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       8. 마무리 — EoC 연결
+  ══════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">나눔의 경제 · Economy of Communion</div>
+
+    <div style="max-width: 820px; width: 100%; text-align: center;">
+      <p style="font-family: var(--serif); font-size: clamp(18px, 2.2vw, 28px); font-weight: 300; color: #fff; line-height: 1.85; margin-bottom: 40px;">
+        나그네방은 모든 이의 대안이 아닙니다.<br />
+        하지만 <span style="color: var(--teal);">어떤 이들에게는</span><br />삶에서 경험한 최고의 시절이 될 수 있습니다.
+      </p>
+
+      <!-- EoC 순환 구조 -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px;">
+        <div style="text-align:center; padding:24px 32px; background:rgba(202,176,153,.15); border:1px solid rgba(202,176,153,.3); border-radius:16px; min-width:160px;">
+          <div style="font-size:.72rem; font-weight:700; letter-spacing:.08em; color:var(--tan); margin-bottom:8px;">영리</div>
+          <div style="font-size:.95rem; font-weight:700; color:var(--cream); margin-bottom:4px;">코이노니아 스테이</div>
+          <p style="font-size:.8rem; color:rgba(243,241,217,.55); margin:0; line-height:1.6;">안동 여행자 숙소</p>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 20px; color:var(--tan); font-size:.75rem; font-weight:600; letter-spacing:.04em;">
+          <svg width="36" height="16" viewBox="0 0 36 16" fill="none"><path d="M0 8h32M28 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>수익 전액</span>
+        </div>
+        <div style="text-align:center; padding:24px 32px; background:rgba(102,153,153,.22); border:1px solid var(--teal); border-radius:16px; min-width:160px;">
+          <div style="font-size:.72rem; font-weight:700; letter-spacing:.08em; color:#a8d4d4; margin-bottom:8px;">비영리</div>
+          <div style="font-size:.95rem; font-weight:700; color:var(--cream); margin-bottom:4px;">서울 나그네방</div>
+          <p style="font-size:.8rem; color:rgba(243,241,217,.55); margin:0; line-height:1.6;">청년 공유 주거</p>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 20px; color:var(--teal); font-size:.75rem; font-weight:600; letter-spacing:.04em;">
+          <svg width="36" height="16" viewBox="0 0 36 16" fill="none"><path d="M0 8h32M28 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>삶의 기반</span>
+        </div>
+        <div style="text-align:center; padding:24px 32px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; min-width:160px;">
+          <div style="font-size:.72rem; font-weight:700; letter-spacing:.08em; color:rgba(255,255,255,.45); margin-bottom:8px;">사람</div>
+          <div style="font-size:.95rem; font-weight:700; color:var(--cream); margin-bottom:4px;">청년 나그네</div>
+          <p style="font-size:.8rem; color:rgba(243,241,217,.55); margin:0; line-height:1.6;">독립을 준비하는 이들</p>
+        </div>
+      </div>
+
+      <div style="padding:16px 28px; border-top: 1px solid rgba(255,255,255,.1);">
+        <p style="font-size: 12.5px; color: rgba(255,255,255,.45); margin: 0; line-height: 1.8;">
+          나그네방 100호를 향해 — 한 칸 두 칸 늘어날수록, 각자의 속도로 온전히 살아가는 이들도 늘어납니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.deck -->
+
+<!-- ── ARROWS ── -->
+<button class="arrow prev" id="prev" aria-label="이전">
+  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+</button>
+<button class="arrow next" id="next" aria-label="다음">
+  <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+</button>
+
+<!-- ── DOTS ── -->
+<div class="nav-dots" id="dots"></div>
+
+<!-- ── SLIDE NUM ── -->
+<div class="slide-num" id="slideNum">1 / 8</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl = document.getElementById('dots');
+  const numEl  = document.getElementById('slideNum');
+  let cur = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot';
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+
+    const dark = slides[cur].dataset.dark === 'true';
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.className = 'dot' + (dark ? ' dk' : '') + (i === cur ? ' active' : '');
+    });
+    numEl.className = 'slide-num' + (dark ? ' lt' : '');
+    numEl.textContent = (cur + 1) + ' / ' + slides.length;
+
+    document.getElementById('prev').style.color = dark ? '#fff' : '#000';
+    document.getElementById('next').style.color = dark ? '#fff' : '#000';
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(cur - 1);
+  });
+
+  // Touch swipe
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) dx < 0 ? go(cur + 1) : go(cur - 1);
+  });
+
+  go(0);
+</script>
+</body>
+</html>
