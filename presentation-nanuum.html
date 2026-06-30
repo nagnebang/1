@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나눔이라는 목적은 우리에게 어떤 힘을 갖게 해주나</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --cream: #F3F1D9;
+      --tan:   #CAB099;
+      --teal:  #669999;
+      --sage:  #93A084;
+      --ink:   #1C1C1A;
+      --ink2:  #444440;
+      --white: #FDFAF3;
+      --serif: 'Noto Serif KR', serif;
+      --sans:  'Pretendard', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: var(--sans); }
+
+    /* ── DECK & SLIDES ── */
+    .deck { width: 100%; height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 56px 72px;
+    }
+    .slide.active { display: flex; }
+
+    /* ── BACKGROUNDS ── */
+    .bg-cream { background: var(--cream); }
+    .bg-white { background: var(--white); }
+    .bg-ink   { background: var(--ink); }
+    .bg-teal  { background: var(--teal); }
+
+    /* image backgrounds */
+    .bg-img {
+      background-size: cover;
+      background-position: center;
+    }
+    .bg-overlay::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(28,28,26,.62);
+      z-index: 0;
+    }
+    .bg-overlay > * { position: relative; z-index: 1; }
+
+    /* ── TYPE ── */
+    .slide-tag {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: .13em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 18px;
+    }
+    .slide-tag.lt { color: rgba(255,255,255,.55); }
+    .slide-tag.wt { color: rgba(255,255,255,.8); }
+
+    h1 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.25; color: var(--ink); text-align: center;
+    }
+    h1.lt { color: #fff; }
+
+    h2 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(22px, 2.8vw, 38px);
+      line-height: 1.3; color: var(--ink);
+    }
+    h2.lt { color: #fff; }
+    h2.center { text-align: center; }
+
+    h3 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(16px, 1.8vw, 24px);
+      color: var(--ink); margin-bottom: 8px;
+    }
+    h3.lt { color: #fff; }
+
+    .sub {
+      font-size: clamp(13px, 1.3vw, 17px);
+      color: var(--ink2); line-height: 1.85;
+      text-align: center; margin-top: 18px;
+    }
+    .sub.lt { color: rgba(255,255,255,.75); }
+
+    p { font-size: clamp(12px, 1.15vw, 15px); color: var(--ink2); line-height: 1.85; }
+    p.lt { color: rgba(255,255,255,.8); }
+
+    /* ── NAV ── */
+    .nav-dots {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 100;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(0,0,0,.18); border: none; cursor: pointer;
+      transition: background .25s, transform .25s;
+    }
+    .dot.dk { background: rgba(255,255,255,.28); }
+    .dot.active { background: var(--teal); transform: scale(1.5); }
+    .dot.dk.active { background: #fff; }
+
+    .arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,.15); backdrop-filter: blur(6px);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s; z-index: 100;
+    }
+    .arrow:hover { background: rgba(255,255,255,.3); }
+    .arrow.prev { left: 16px; }
+    .arrow.next { right: 16px; }
+    .arrow svg { width: 16px; height: 16px; }
+
+    .slide-num {
+      position: fixed; top: 20px; right: 28px;
+      font-size: 11px; color: rgba(0,0,0,.28);
+      font-weight: 600; z-index: 100;
+    }
+    .slide-num.lt { color: rgba(255,255,255,.32); }
+
+    /* ── PART LABEL ── */
+    .part-label {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: white;
+      background: var(--teal); border-radius: 40px;
+      padding: 5px 14px; margin-bottom: 20px;
+    }
+    .part-label.tan { background: var(--tan); }
+
+    /* ── LAYOUT ── */
+    .row  { display: flex; gap: 28px; width: 100%; align-items: flex-start; }
+    .col  { flex: 1; }
+    .g2   { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+    .g3   { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; width: 100%; }
+    .g4   { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; width: 100%; }
+
+    /* ── CARDS ── */
+    .card { background: white; border-radius: 14px; padding: 24px 20px; box-shadow: 0 3px 16px rgba(0,0,0,.07); }
+    .card.cr  { background: var(--cream); box-shadow: none; }
+    .card.tnk { background: var(--ink); }
+
+    .clabel {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 8px;
+    }
+    .clabel.lt { color: rgba(255,255,255,.55); }
+
+    /* ── STAT ── */
+    .stat { text-align: center; padding: 28px 16px; }
+    .stat-n {
+      font-family: var(--serif); font-size: clamp(40px, 5.5vw, 72px);
+      font-weight: 300; color: var(--teal); line-height: 1;
+    }
+    .stat-u { font-size: 13px; color: var(--tan); display: block; margin-top: 4px; }
+    .stat-l { font-size: 12px; color: var(--ink2); margin-top: 8px; line-height: 1.5; }
+
+    /* ── QUOTE ── */
+    .quote {
+      font-family: var(--serif); font-size: clamp(17px, 2.1vw, 26px);
+      font-weight: 300; line-height: 1.75; color: var(--ink);
+      text-align: center; max-width: 720px; position: relative; padding: 0 20px;
+    }
+    .quote.lt { color: #fff; }
+    .quote::before {
+      content: '\201C'; font-size: 100px; line-height: 0;
+      position: absolute; top: 24px; left: -8px;
+      color: var(--tan); opacity: .35; font-family: Georgia, serif;
+    }
+
+    /* ── TIMELINE ── */
+    .tl-row {
+      display: grid; grid-template-columns: 96px 1fr; gap: 16px;
+      align-items: start; padding: 14px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .tl-row:last-child { border-bottom: none; }
+    .tl-yr {
+      font-family: var(--serif); font-size: 20px;
+      font-weight: 300; color: var(--teal);
+    }
+    .tl-body h4 { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .tl-body p  { font-size: 12px; color: var(--ink2); line-height: 1.65; }
+
+    /* ── HISTORY TIMELINE (vertical) ── */
+    .htl { display: flex; flex-direction: column; gap: 0; }
+    .htl-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding-bottom: 18px; position: relative;
+    }
+    .htl-item::before {
+      content: ''; position: absolute; left: 31px; top: 32px;
+      width: 1px; height: calc(100% - 16px);
+      background: var(--tan); opacity: .4;
+    }
+    .htl-item:last-child::before { display: none; }
+    .htl-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--teal); flex-shrink: 0;
+      margin-top: 5px; margin-left: 27px;
+    }
+    .htl-yr {
+      width: 44px; font-family: var(--serif); font-size: 14px;
+      font-weight: 300; color: var(--teal); flex-shrink: 0; padding-top: 1px;
+      text-align: right;
+    }
+    .htl-text h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .htl-text p  { font-size: 11.5px; color: var(--ink2); line-height: 1.6; }
+
+    /* ── TABLE ── */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .tbl th { background: var(--ink); color: #fff; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11.5px; }
+    .tbl td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,.07); color: var(--ink2); }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl .total td { font-weight: 700; color: var(--ink); background: var(--cream); }
+    .tbl .num { text-align: right; }
+
+    /* ── AGENDA ── */
+    .ag-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .ag-item:last-child { border-bottom: none; }
+    .ag-n {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--teal); color: white; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+    }
+    .ag-t h4 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .ag-t p  { font-size: 12px; color: var(--ink2); line-height: 1.6; }
+
+    /* ── ROLE BOX ── */
+    .role { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+    .role h4 { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
+    .role ul { padding-left: 14px; }
+    .role li { font-size: 12.5px; color: var(--ink2); line-height: 1.9; }
+
+    /* ── SPLIT (image + content) ── */
+    .split {
+      display: grid; grid-template-columns: 1fr 1fr;
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+    }
+    .split-img {
+      background-size: cover; background-position: center;
+      position: relative;
+    }
+    .split-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(28,28,26,.15), transparent);
+    }
+    .split-body {
+      display: flex; flex-direction: column;
+      justify-content: center; padding: 60px 52px;
+      overflow-y: auto;
+    }
+
+    /* ── FLOW ── */
+    .flow { display: flex; align-items: center; gap: 12px; justify-content: center; }
+    .fn { background: white; border-radius: 14px; padding: 20px 24px; text-align: center; box-shadow: 0 3px 16px rgba(0,0,0,.07); flex: 1; max-width: 220px; }
+    .fn.hl { background: var(--teal); }
+    .fn .fl { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; color: var(--teal); }
+    .fn.hl .fl { color: rgba(255,255,255,.6); }
+    .fn h4 { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .fn.hl h4 { color: #fff; }
+    .fn p { font-size: 11px; color: var(--ink2); margin-top: 4px; line-height: 1.6; }
+    .fn.hl p { color: rgba(255,255,255,.75); }
+    .farr { color: var(--tan); flex-shrink: 0; font-size: 11px; text-align: center; }
+
+    /* ── VALUE ── */
+    .val { padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,.07); }
+    .val:last-child { border-bottom: none; }
+    .val-n { font-weight: 700; font-size: 13px; color: var(--teal); margin-bottom: 3px; }
+    .val-d { font-size: 12px; color: var(--ink2); line-height: 1.6; }
+
+    /* ── WARN ── */
+    .warn {
+      background: #FFF3CD; border-left: 3px solid #F59E0B;
+      border-radius: 0 10px 10px 0; padding: 12px 18px;
+      width: 100%; margin-top: 20px;
+    }
+    .warn p { font-size: 12px; color: #92400E; }
+
+    /* ── DIVIDER ── */
+    .div { width: 36px; height: 2px; background: var(--tan); margin: 20px auto; }
+    .div.lt { background: rgba(255,255,255,.2); }
+
+    /* ── IMAGE CARD ── */
+    .img-card {
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    }
+    .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ── SIGN CHECKLIST ── */
+    .chk-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .chk-item:last-child { border-bottom: none; }
+    .chk-box {
+      width: 22px; height: 22px; border-radius: 4px;
+      border: 2px solid var(--tan); flex-shrink: 0;
+    }
+    .chk-text { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+    .chk-text strong { color: var(--ink); }
+
+    /* ── ORG ── */
+    .org-top { display: flex; justify-content: center; margin-bottom: 12px; }
+    .org-row { display: flex; justify-content: center; gap: 16px; }
+    .org-node {
+      background: white; border-radius: 12px; padding: 14px 18px;
+      text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      min-width: 120px;
+    }
+    .org-node.hl { background: var(--teal); }
+    .org-role { font-size: 9.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--teal); margin-bottom: 4px; }
+    .org-node.hl .org-role { color: rgba(255,255,255,.65); }
+    .org-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .org-node.hl .org-name { color: #fff; }
+    .org-line { width: 1px; height: 20px; background: var(--tan); margin: 0 auto; opacity: .5; }
+    .org-hline { height: 1px; background: var(--tan); opacity: .4; margin: 0 60px 0; position: relative; top: 20px; }
+
+    @media print {
+      html, body { overflow: visible; background: white; height: auto; }
+      .deck { height: auto; position: static; }
+      .slide {
+        display: flex !important;
+        position: relative; inset: auto;
+        width: 100%; height: 100vh;
+        page-break-after: always;
+        break-after: page;
+      }
+      .arrow, .nav-dots, .slide-num { display: none; }
+      .split { position: relative; height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════════
+       1. 표지
+  ══════════════════════════════ -->
+  <div class="slide bg-img bg-overlay" data-dark="true"
+       style="background-image: url('images/gathering.jpeg');">
+    <div class="slide-tag wt">나그네방 · Here I Am</div>
+    <h1 class="lt" style="margin-bottom:14px; text-shadow: 0 2px 12px rgba(0,0,0,.4);">
+      나눔이라는 목적은<br />우리에게 어떤 힘을<br />갖게 해주나
+    </h1>
+    <div class="div lt"></div>
+    <p class="lt" style="text-align:center; font-size:15px; margin-top:0;">
+      <span style="color:rgba(255,255,255,.42); font-size:12px; margin-top:4px; display:block;">대표 유하영</span>
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════
+       2. 목차
+  ══════════════════════════════ -->
+  <div class="slide bg-cream">
+    <div class="slide-tag">오늘의 순서</div>
+    <h2 style="margin-bottom: 32px; text-align:center;">이야기 흐름</h2>
+    <div class="g3" style="max-width: 860px; gap: 16px;">
+
+      <div class="card" style="border-top: 3px solid var(--teal); padding: 28px 24px;">
+        <div class="clabel">Part 1</div>
+        <h3 style="font-size:16px; margin-bottom:6px;">나그네방 소개</h3>
+        <p style="font-size:12px;">연혁 · 법인 설립 이유</p>
+      </div>
+
+      <div class="card" style="border-top: 3px solid var(--teal); padding: 28px 24px;">
+        <div class="clabel">Part 2</div>
+        <h3 style="font-size:16px; margin-bottom:6px;">앞으로의 계획</h3>
+        <p style="font-size:12px;">비전·미션 · 3개년 목표 · 재정 구조</p>
+      </div>
+
+      <div class="card" style="border-top: 3px solid var(--tan); padding: 28px 24px;">
+        <div class="clabel" style="color: var(--sage);">Part 3</div>
+        <h3 style="font-size:16px; margin-bottom:6px;">Q&amp;A</h3>
+        <p style="font-size:12px;">질문과 나눔</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       3-A. 연혁 (2018–2024 서울)
+  ══════════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split">
+      <div class="split-img" style="background-image: url('images/living-space.jpeg');"></div>
+      <div class="split-body bg-white">
+        <div class="slide-tag">Part 1 — 나그네방 소개</div>
+        <h2 style="margin-bottom: 8px;">나그네방<br />7년의 연혁</h2>
+        <p style="font-size:12px; color:var(--ink2); margin-bottom:24px;">방 문은 한 번도 닫힌 적이 없었습니다.</p>
+        <div class="htl">
+          <div class="htl-item">
+            <span class="htl-yr">2018</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 구로구 오류동</h4>
+              <p>두 청년이 남은 방 하나를 내어주며 시작됐습니다.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr">2020</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 용산구 이전</h4>
+              <p>이사하면서도 방 문은 닫히지 않았습니다.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr">2022</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 성북구 보문동</h4>
+              <p>외국인 입주자도 함께하기 시작했습니다.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr">2024</span>
+            <div class="htl-dot"></div>
+            <div class="htl-text">
+              <h4>서울 성북구 성북동 정착</h4>
+              <p>성북동을 영구 거점으로, 뿌리를 내렸습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       3-B. 연혁 (2026–지금, 새 챕터)
+  ══════════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split">
+      <div class="split-img" style="background-image: url('images/andong-living.jpeg');"></div>
+      <div class="split-body bg-ink">
+        <div class="slide-tag lt">Part 1 — 나그네방 소개</div>
+        <h2 class="lt" style="margin-bottom: 8px;">그리고<br />새로운 챕터</h2>
+        <p style="font-size:12px; color:rgba(243,241,217,.5); margin-bottom:28px;">개인의 헌신에서 조직의 지속으로.</p>
+        <div class="htl">
+          <div class="htl-item">
+            <span class="htl-yr" style="color:var(--tan);">2026</span>
+            <div class="htl-dot" style="background:var(--tan);"></div>
+            <div class="htl-text">
+              <h4 style="color:var(--cream);">경북 안동 — 코이노니아 스테이 오픈</h4>
+              <p style="color:rgba(243,241,217,.6);">영리 수익이 비영리를 지탱하는 구조의 첫 실험.</p>
+            </div>
+          </div>
+          <div class="htl-item">
+            <span class="htl-yr" style="color:var(--teal); font-weight:600;">지금</span>
+            <div class="htl-dot" style="background:var(--teal); box-shadow:0 0 0 3px rgba(102,153,153,.25);"></div>
+            <div class="htl-text">
+              <h4 style="color:var(--cream);">사단법인 설립 — 오늘</h4>
+              <p style="color:rgba(243,241,217,.6);">7년의 개인 운영을 공식 조직으로. 여러분과 함께.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       4. 숫자로 보는 나그네방
+  ══════════════════════════════ -->
+  <div class="slide bg-cream">
+    <div class="slide-tag">7년의 기록</div>
+    <h2 class="center" style="margin-bottom: 36px;">숫자로 보는 나그네방</h2>
+    <div class="g3" style="max-width: 840px;">
+      <div class="card stat">
+        <div class="stat-n">40<span style="font-size:30px;">여</span></div>
+        <div class="stat-u">명</div>
+        <div class="stat-l">내·외국인 누적 입주자<br />(2018–2025)</div>
+      </div>
+      <div class="card stat">
+        <div class="stat-n">100<span style="font-size:28px;">%</span></div>
+        <div class="stat-u">&nbsp;</div>
+        <div class="stat-l">자발적 독립 전환율<br />단 한 번의 강제 퇴실 없음</div>
+      </div>
+      <div class="card stat">
+        <div class="stat-n">4</div>
+        <div class="stat-u">개 거점</div>
+        <div class="stat-l">구로 → 용산 → 성북 → 안동<br />현재 방 3칸 + 안동 스테이 운영 중</div>
+      </div>
+    </div>
+    <div style="max-width: 840px; width: 100%; margin-top: 20px;">
+      <div class="img-card" style="height: 140px;">
+        <img src="images/meal-together2.jpeg" alt="나그네방 식사" style="width:100%; height:100%; object-fit:cover; object-position: center 40%;" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       4-1. 나그네방이란 (콩쥐팥쥐 비유)
+  ══════════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split">
+      <div class="split-img" style="background-image: url('images/gathering.jpeg');"></div>
+      <div class="split-body bg-ink">
+        <div class="slide-tag lt">Part 1 — 나그네방 소개</div>
+        <h2 class="lt" style="margin-bottom:12px;">세상의 밑 빠진 독을<br />채우는 나그네방</h2>
+        <p style="font-size:12.5px; color:rgba(243,241,217,.6); margin-bottom:28px; line-height:1.8;">
+          전래동화 콩쥐팥쥐에서, 두꺼비는 밑 빠진 독을 메꿔주고 암소는 혼자 갈 수 없는 돌밭을 갈아줍니다. 콩쥐는 결국 원님의 파티에 갑니다.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:28px;">
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-size:11px; font-weight:700; color:var(--tan); min-width:56px; padding-top:2px;">콩쥐</span>
+            <span style="font-size:12.5px; color:rgba(243,241,217,.7); line-height:1.6;">오늘을 살아가는 청년 — 혼자서는 감당하기 벅찬 시련을 마주한 이들</span>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-size:11px; font-weight:700; color:#a8d4d4; min-width:56px; padding-top:2px;">나그네방</span>
+            <span style="font-size:12.5px; color:rgba(243,241,217,.7); line-height:1.6;">두꺼비이자 암소이자 참새 — 그 파티에 함께 가기 위한 든든한 뒷배</span>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,.1); padding-top:18px;">
+          <p style="font-size:12px; color:rgba(243,241,217,.4); line-height:1.8; margin:0; font-style:italic;">
+            "나그네방이 모든 이의 대안은 아닙니다.<br />하지만 어떤 이들에게는 삶에서 경험한 최고의 시절이 될 수 있습니다."
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       5. 법인 설립 이유
+  ══════════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">법인 설립 이유</div>
+    <h2 class="lt" style="margin-bottom:8px; text-align:center;">7년 동안 개인이 지탱해왔습니다</h2>
+    <p class="lt" style="text-align:center; margin-bottom:32px; font-size:13px;">이제 두 가지 한계를 넘을 차례입니다.</p>
+    <div style="display: flex; gap: 20px; width: 100%; max-width: 860px;">
+      <div style="flex:1; background: rgba(255,255,255,.07); border-radius: 16px; padding: 28px 24px;">
+        <div style="font-size:28px; margin-bottom:12px;">🏠</div>
+        <h3 class="lt" style="font-size:15px; margin-bottom:8px;">더 많은 청년을 품을 수 없다</h3>
+        <p class="lt" style="font-size:12.5px;">입주 문의는 이미 가용 공간을 초과하고 있습니다. 개인 운영 구조로는 공간 확장과 안정적인 지속이 불가능합니다.</p>
+      </div>
+      <div style="flex:1; background: rgba(255,255,255,.07); border-radius: 16px; padding: 28px 24px;">
+        <div style="font-size:28px; margin-bottom:12px;">🧾</div>
+        <h3 class="lt" style="font-size:15px; margin-bottom:8px;">기부금 영수증을 발급할 수 없다</h3>
+        <p class="lt" style="font-size:12.5px;">후원자에게 공식 영수증을 발급하지 못해 신뢰 기반의 재정 구조를 갖추지 못하고 있습니다. 법인이 이 문제를 해결합니다.</p>
+      </div>
+    </div>
+    <div style="margin-top: 28px; background: rgba(102,153,153,.2); border-radius: 12px; padding: 16px 28px; max-width: 860px; text-align:center;">
+      <p class="lt" style="font-size:13.5px;">나그네방은 이 한계를 넘기 위해 <strong style="color: var(--teal);">사단법인</strong>을 설립합니다.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       5-1. 청년 주거 현실
+  ══════════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">왜 지금 나그네방인가</div>
+    <h2 class="center" style="margin-bottom: 6px;">서울 청년의 주거 현실</h2>
+    <p class="sub" style="font-size:12.5px; margin-bottom:28px;">2024 주거실태조사 기준</p>
+    <div class="g2" style="max-width: 860px; gap: 16px;">
+      <div class="card" style="border-left: 3px solid var(--teal); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">35.4<span style="font-size:22px;">%</span></div>
+        <div class="stat-l" style="margin-top:6px;">서울 청년 1인 가구가<br />소득 중 주거비로 지출<br /><span style="font-size:11px; color:var(--tan);">UN 권고 기준 30% 초과</span></div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--teal); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">60<span style="font-size:22px;">만원</span></div>
+        <div class="stat-l" style="margin-top:6px;">서울 지역 평균 월세<br />보증금 1,000만 원 이상 요구<br /><span style="font-size:11px; color:var(--tan);">자가점유율 12.2%에 불과</span></div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--tan); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">17.9<span style="font-size:22px;">%</span></div>
+        <div class="stat-l" style="margin-top:6px;">고시원 등 주택 이외 거처<br />거주 청년 비율<br /><span style="font-size:11px; color:var(--tan);">최저주거기준 미달 8.2%</span></div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--tan); padding: 20px 22px;">
+        <div class="stat-n" style="font-size: 42px;">69<span style="font-size:22px;">만</span></div>
+        <div class="stat-l" style="margin-top:6px;">주거 문제 경험 청년 가구<br />그 중 56%가 수도권 집중<br /><span style="font-size:11px; color:var(--tan);">이렇게 살면 독립이 가능할까요?</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       5-2. 나그네방이 주는 것
+  ══════════════════════════════ -->
+  <div class="slide" style="padding:0;">
+    <div class="split" style="flex-direction:row-reverse;">
+      <div class="split-img" style="background-image: url('images/laughing-together.jpg'); background-position: center;"></div>
+      <div class="split-body bg-cream">
+        <div class="slide-tag">나그네방이 주는 것</div>
+        <h2 style="margin-bottom:6px;">월 100만원으로<br />우리가 얻은 것</h2>
+        <p style="font-size:12px; color:var(--ink2); margin-bottom:24px;">청년 3명이 함께 살며 경험한 변화</p>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-size:18px; line-height:1;">🏠</span>
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px;">안전한 주거 기반</div>
+              <p style="font-size:12px; color:var(--ink2); line-height:1.6; margin:0;">계약서도 보증금도 없이, 각자의 속도로 자립을 준비하는 공간</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-size:18px; line-height:1;">💛</span>
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px;">삶의 품질 회복</div>
+              <p style="font-size:12px; color:var(--ink2); line-height:1.6; margin:0;">아낀 주거비로 먹고 입고 배우는 일에 — 사람답게 사는 일</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-size:18px; line-height:1;">🤝</span>
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px;">관계와 공동체</div>
+              <p style="font-size:12px; color:var(--ink2); line-height:1.6; margin:0;">가족 관계의 회복, 각자도생 시대에 기댈 곳이 있다는 감각</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <span style="font-size:18px; line-height:1;">🌱</span>
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px;">한 사람의 성숙</div>
+              <p style="font-size:12px; color:var(--ink2); line-height:1.6; margin:0;">함께 사는 법을 몸으로 익히는 것 — 어렵지만 가장 가치 있는 일</p>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:22px; padding-top:18px; border-top:1px solid var(--rule);">
+          <p style="font-size:12.5px; color:var(--teal); font-weight:600; margin:0;">이 방식이 유용하다면, 더 많은 이들과 나눠야 합니다 →</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       6. 비전 & 미션
+  ══════════════════════════════ -->
+  <div class="slide bg-teal" data-dark="true">
+    <div class="slide-tag lt">Part 2 — 앞으로의 계획</div>
+    <div style="text-align: center; max-width: 820px;">
+      <p style="font-size:9.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:10px;">VISION</p>
+      <p style="font-size: clamp(15px, 1.8vw, 22px); color: #fff; font-family: var(--serif); font-weight: 300; line-height: 1.6; margin-bottom: 32px;">
+        기댈 곳이 필요한 이들의 도심 속 안식처
+      </p>
+      <div style="width: 40px; height: 1px; background: rgba(255,255,255,.3); margin: 0 auto 28px;"></div>
+      <p style="font-size:9.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:14px;">MISSION</p>
+      <p style="font-size: clamp(13px, 1.4vw, 16px); color: rgba(255,255,255,.9); line-height: 2;">
+        청년의 삶에 필요한 <strong style="color:#fff;">주거, 성장, 문화</strong>의 기반을 함께 만들어가며<br />
+        나그네방 100호를 설립한다.<br />
+        우리가 만든 나그네방이 한 칸 두 칸 늘어날수록,<br />
+        각자의 속도로 온전히 살아가는 이들도 늘어날 거라고 믿습니다.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       7. 3개년 목표
+  ══════════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">3개년 핵심 목표</div>
+    <h2 class="center" style="margin-bottom: 28px;">단계별 추진 계획</h2>
+    <div class="g3" style="max-width: 920px; gap: 18px;">
+
+      <div style="background: var(--cream); border-radius: 16px; padding: 28px 22px; border-top: 3px solid var(--teal);">
+        <div style="font-family: var(--serif); font-size: 28px; font-weight: 300; color: var(--teal); margin-bottom: 8px;">2026</div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing:.08em; text-transform:uppercase; color: var(--tan); margin-bottom: 14px;">1년차 — 기반 구축</div>
+        <div class="val" style="padding: 8px 0;">
+          <div class="val-n" style="font-size: 12px;">법인 설립 완료</div>
+          <div class="val-d">성북동 거점 공식 전환</div>
+        </div>
+        <div class="val" style="padding: 8px 0;">
+          <div class="val-n" style="font-size: 12px;">후원자 30인 달성</div>
+          <div class="val-d">기부금 영수증 발급 개시</div>
+        </div>
+        <div class="val" style="padding: 8px 0; border-bottom: none;">
+          <div class="val-n" style="font-size: 12px;">입주자 4~6인 운영</div>
+          <div class="val-d">자립 전환 사례 3건</div>
+        </div>
+      </div>
+
+      <div style="background: var(--cream); border-radius: 16px; padding: 28px 22px; border-top: 3px solid var(--teal);">
+        <div style="font-family: var(--serif); font-size: 28px; font-weight: 300; color: var(--teal); margin-bottom: 8px;">2027</div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing:.08em; text-transform:uppercase; color: var(--tan); margin-bottom: 14px;">2년차 — 첫 번째 확장</div>
+        <div class="val" style="padding: 8px 0;">
+          <div class="val-n" style="font-size: 12px;">서울 2호점 개소</div>
+          <div class="val-d">남성 청년 대상 공유주거</div>
+        </div>
+        <div class="val" style="padding: 8px 0;">
+          <div class="val-n" style="font-size: 12px;">누적 입주자 55인</div>
+          <div class="val-d">첫 외부 보조금 확보</div>
+        </div>
+        <div class="val" style="padding: 8px 0; border-bottom: none;">
+          <div class="val-n" style="font-size: 12px;">후원자 60인 달성</div>
+          <div class="val-d">자립 전환 사례 6건</div>
+        </div>
+      </div>
+
+      <div style="background: var(--cream); border-radius: 16px; padding: 28px 22px; border-top: 3px solid var(--tan);">
+        <div style="font-family: var(--serif); font-size: 28px; font-weight: 300; color: var(--teal); margin-bottom: 8px;">2028</div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing:.08em; text-transform:uppercase; color: var(--tan); margin-bottom: 14px;">3년차 — 모델 검증</div>
+        <div class="val" style="padding: 8px 0;">
+          <div class="val-n" style="font-size: 12px;">위탁운영 1호 계약</div>
+          <div class="val-d">운영 매뉴얼 공식화</div>
+        </div>
+        <div class="val" style="padding: 8px 0;">
+          <div class="val-n" style="font-size: 12px;">후원자 100인 달성</div>
+          <div class="val-d">보조금·공모 1,000만 원</div>
+        </div>
+        <div class="val" style="padding: 8px 0; border-bottom: none;">
+          <div class="val-n" style="font-size: 12px;">자립 사례 10건 이상</div>
+          <div class="val-d">문서화 및 공개</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       8-A. 코이노니아 스테이 — 플로우
+  ══════════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">경제적 지속가능성</div>
+    <h2 class="lt" style="margin-bottom:10px; text-align:center;">나그네방이 스스로 서기 위해</h2>
+    <p style="font-size:13px; color:rgba(243,241,217,.65); text-align:center; margin-bottom:40px; line-height:1.7;">
+      나그네방은 후원에만 의존하지 않습니다. 직접 수익 활동을 통해<br />안정적인 운영 기반을 만들어가고 있습니다.
+    </p>
+    <!-- 플로우 다이어그램 -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap;">
+      <div style="text-align:center; padding:28px 36px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:18px; min-width:180px;">
+        <div style="display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.08em; padding:3px 10px; border-radius:20px; background:rgba(202,176,153,.2); color:var(--tan); margin-bottom:12px;">영리</div>
+        <h4 style="font-size:1rem; font-weight:700; color:var(--cream); margin-bottom:6px;">코이노니아 스테이</h4>
+        <p style="font-size:.85rem; color:rgba(243,241,217,.6); line-height:1.6; margin:0;">경상북도 안동<br />여행자 숙소 운영</p>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px; padding:0 20px; color:var(--tan); font-size:.78rem; font-weight:600; letter-spacing:.04em;">
+        <svg width="36" height="16" viewBox="0 0 36 16" fill="none"><path d="M0 8h32M28 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>수익 전액</span>
+      </div>
+      <div style="text-align:center; padding:28px 36px; background:rgba(102,153,153,.25); border:1px solid var(--teal); border-radius:18px; min-width:180px;">
+        <div style="display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.08em; padding:3px 10px; border-radius:20px; background:rgba(102,153,153,.3); color:#a8d4d4; margin-bottom:12px;">비영리</div>
+        <h4 style="font-size:1rem; font-weight:700; color:var(--cream); margin-bottom:6px;">서울 나그네방</h4>
+        <p style="font-size:.85rem; color:rgba(243,241,217,.6); line-height:1.6; margin:0;">청년 공유주거<br />안정적 운영 지속</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       8-B. 코이노니아 스테이 — 카드
+  ══════════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">경제적 지속가능성</div>
+    <!-- 카드 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.1); max-width:860px; width:100%; margin-bottom:32px;">
+      <div style="position:relative; min-height:280px;">
+        <img src="images/andong-living.jpeg" alt="안동 코이노니아 스테이" style="width:100%; height:100%; object-fit:cover; display:block;" />
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:20px; background:linear-gradient(transparent,rgba(0,0,0,.6));">
+          <span style="font-size:.82rem; color:rgba(255,255,255,.9); background:rgba(0,0,0,.4); padding:5px 12px; border-radius:20px;">📍 경북 안동시 중앙로 57번지 3층</span>
+        </div>
+      </div>
+      <div style="padding:36px 32px; background:rgba(255,255,255,.05); display:flex; flex-direction:column; justify-content:center; gap:14px;">
+        <span style="font-size:.72rem; font-weight:700; letter-spacing:.08em; padding:3px 10px; border-radius:20px; background:rgba(202,176,153,.15); color:var(--tan); display:inline-block; align-self:flex-start;">안동 나그네방</span>
+        <h3 style="font-size:1.5rem; font-weight:700; color:var(--cream); margin:4px 0 0;">코이노니아 스테이</h3>
+        <p style="font-size:.9rem; color:rgba(243,241,217,.75); line-height:1.8; margin:0;">나그네방 운영자들이 경상북도로 이주해 만든 새로운 로컬 커뮤니티 공간입니다. 안동 구도심에 위치한 여행자 숙소로 2026년 1월에 문을 열었으며, <strong style="color:var(--cream);">수익금 전액은 서울 나그네방 운영비</strong>로 사용됩니다.</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; padding:0; margin:0;">
+          <li style="font-size:.875rem; color:rgba(243,241,217,.65);">📅 2026년 1월 오픈</li>
+          <li style="font-size:.875rem; color:rgba(243,241,217,.65);">🔗 코이노니아 스테이 소속</li>
+          <li style="font-size:.875rem; color:rgba(243,241,217,.65);">💛 수익 전액 → 서울 나그네방 운영</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 비전 노트 -->
+    <div style="text-align:center; padding:20px 0 0; border-top:1px solid rgba(255,255,255,.1); max-width:860px; width:100%;">
+      <p style="font-size:.9rem; color:rgba(243,241,217,.5); line-height:1.9; margin:0;">코이노니아 스테이는 나그네방이 꿈꾸는 지속가능한 구조의 첫 번째 실험입니다.<br />앞으로도 나그네방은 계속해서 더 많은 이들을 품고 확장될 거예요.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       9. 재정 구조 표
+  ══════════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">재정 구조</div>
+    <h2 class="lt center" style="margin-bottom:6px;">세 가지 기둥으로 운영됩니다</h2>
+    <p style="font-size:13px; color:rgba(243,241,217,.55); text-align:center; margin-bottom:32px;">나그네방 비영리 법인의 재정 구조</p>
+
+    <!-- 3 기둥 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; max-width:900px; width:100%; margin-bottom:20px;">
+
+      <!-- 기둥 1: 나그네 책임비 -->
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:28px 22px; display:flex; flex-direction:column; gap:12px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--tan); text-transform:uppercase;">기둥 1</div>
+        <div style="font-size:16px; font-weight:700; color:var(--cream); line-height:1.3;">나그네<br />책임비</div>
+        <div style="border-top:1px solid rgba(255,255,255,.1); padding-top:14px;">
+          <div style="font-size:28px; font-weight:700; color:var(--cream); line-height:1;">月 40<span style="font-size:14px;">만원</span></div>
+          <div style="font-size:11px; color:rgba(243,241,217,.45); margin-top:4px;">3인 × 평균 13만원</div>
+        </div>
+        <p style="font-size:11.5px; color:rgba(243,241,217,.6); line-height:1.7; margin:0;">입주자가 수입의 10% 내외를 내는 방식. 부담 없이, 자립을 준비하는 동안</p>
+        <div style="margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);">
+          <div style="font-size:11px; color:rgba(243,241,217,.4);">연간 목표</div>
+          <div style="font-size:13px; color:var(--tan); font-weight:600;">720만원 <span style="font-size:10px; opacity:.7;">→ '27 1,440만원</span></div>
+        </div>
+      </div>
+
+      <!-- 기둥 2: 히어아이엠 후원 (가운데, 강조) -->
+      <div style="background:rgba(102,153,153,.2); border:1px solid var(--teal); border-radius:18px; padding:28px 22px; display:flex; flex-direction:column; gap:12px; position:relative;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; color:#a8d4d4; text-transform:uppercase;">기둥 2</div>
+        <div style="font-size:16px; font-weight:700; color:var(--cream); line-height:1.3;">히어아이엠<br />후원</div>
+        <div style="border-top:1px solid rgba(102,153,153,.3); padding-top:14px;">
+          <div style="font-size:28px; font-weight:700; color:var(--cream); line-height:1;">月 40<span style="font-size:14px;">만원</span></div>
+          <div style="font-size:11px; color:rgba(243,241,217,.45); margin-top:4px;">조직 정기 후원</div>
+        </div>
+        <p style="font-size:11.5px; color:rgba(243,241,217,.6); line-height:1.7; margin:0;">나그네방을 처음부터 곁에서 지지해온 공동체의 후원</p>
+        <div style="margin-top:auto; padding-top:14px; border-top:1px solid rgba(102,153,153,.2);">
+          <div style="font-size:11px; color:rgba(243,241,217,.4);">연간 목표</div>
+          <div style="font-size:13px; color:#a8d4d4; font-weight:600;">480만원 <span style="font-size:10px; opacity:.7;">→ '27 480만원+α</span></div>
+        </div>
+      </div>
+
+      <!-- 기둥 3: 개인 후원 -->
+      <div style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:28px 22px; display:flex; flex-direction:column; gap:12px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--tan); text-transform:uppercase;">기둥 3</div>
+        <div style="font-size:16px; font-weight:700; color:var(--cream); line-height:1.3;">개인<br />정기 후원</div>
+        <div style="border-top:1px solid rgba(255,255,255,.1); padding-top:14px;">
+          <div style="font-size:28px; font-weight:700; color:var(--cream); line-height:1;">月 20<span style="font-size:14px;">만원</span></div>
+          <div style="font-size:11px; color:rgba(243,241,217,.45); margin-top:4px;">30인 × 평균 3만원 (목표)</div>
+        </div>
+        <p style="font-size:11.5px; color:rgba(243,241,217,.6); line-height:1.7; margin:0;">나그네방의 지지자로 매달 함께하는 개인들의 참여</p>
+        <div style="margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);">
+          <div style="font-size:11px; color:rgba(243,241,217,.4);">연간 목표</div>
+          <div style="font-size:13px; color:var(--tan); font-weight:600;">1,080만원 <span style="font-size:10px; opacity:.7;">→ '27 2,160만원</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 합계 -->
+    <div style="max-width:900px; width:100%; background:rgba(255,255,255,.05); border-radius:14px; padding:16px 28px; display:flex; align-items:center; justify-content:space-between; gap:20px;">
+      <div style="font-size:11px; color:rgba(243,241,217,.4); letter-spacing:.06em;">2026 연간 합계 (보조금 제외)</div>
+      <div style="display:flex; align-items:center; gap:20px;">
+        <div style="text-align:right;">
+          <div style="font-size:11px; color:rgba(243,241,217,.4);">2026</div>
+          <div style="font-size:20px; font-weight:700; color:var(--cream);">2,280만원</div>
+        </div>
+        <div style="color:rgba(243,241,217,.3); font-size:18px;">→</div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; color:rgba(243,241,217,.4);">2027 (2호점 개소 시)</div>
+          <div style="font-size:20px; font-weight:700; color:var(--teal);">4,080만원+α</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       9. 2호점 보증금 마련 방안
+  ══════════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div class="slide-tag lt">재정 구조 — 다음 단계</div>
+    <h2 class="lt" style="margin-bottom: 8px; text-align:center;">
+      서울 2호점을 열기 위해
+    </h2>
+    <p class="lt" style="text-align:center; font-size:13px; margin-bottom:32px; opacity:.7;">
+      후원자 모집만으로는 충분하지 않습니다.<br />임대 보증금이라는 목돈을 마련할 구조가 필요합니다.
+    </p>
+    <div class="g2" style="max-width: 900px; gap: 16px;">
+
+      <div style="background: rgba(255,255,255,.07); border-radius: 16px; padding: 24px 22px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: var(--teal); margin-bottom: 10px;">방안 1</div>
+        <h3 class="lt" style="font-size:15px; margin-bottom:8px;">지정 후원 캠페인</h3>
+        <p class="lt" style="font-size:12.5px;">
+          "2호점 보증금 마련"을 목적으로 한 지정 후원 모집.<br />
+          목표액 설정 → 달성 시 2호점 개소.<br />
+          법인 설립 후 기부금 영수증 발급으로 신뢰도 확보 가능.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,.07); border-radius: 16px; padding: 24px 22px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: var(--teal); margin-bottom: 10px;">방안 2</div>
+        <h3 class="lt" style="font-size:15px; margin-bottom:8px;">사회적 가치 임대 협약</h3>
+        <p class="lt" style="font-size:12.5px;">
+          사회적 목적을 공감하는 임대인과 협의 — 보증금 감액 또는 분할 납부.<br />
+          법인 명의 임대로 계약 안정성 확보.<br />
+          이사회 네트워크를 통한 공간 발굴 가능.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,.07); border-radius: 16px; padding: 24px 22px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: var(--teal); margin-bottom: 10px;">방안 3</div>
+        <h3 class="lt" style="font-size:15px; margin-bottom:8px;">코이노니아 스테이 수익 적립</h3>
+        <p class="lt" style="font-size:12.5px;">
+          안동 스테이 운영 수익을 2호점 보증금 목적으로 적립.<br />
+          운영 안정화 시 연간 적립분 증가.<br />
+          가장 자립적인 재원 구조.
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,.07); border-radius: 16px; padding: 24px 22px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: var(--teal); margin-bottom: 10px;">방안 4</div>
+        <h3 class="lt" style="font-size:15px; margin-bottom:8px;">공공 공모사업·보조금</h3>
+        <p class="lt" style="font-size:12.5px;">
+          법인 설립 후 서울시 청년 주거 관련 공모사업 지원 가능.<br />
+          LH·SH 등 공공기관 유휴 주거공간 협약 (보증금 없는 위탁 방식).<br />
+          1년차 리서치 → 2년차 신청 목표.
+        </p>
+      </div>
+
+    </div>
+    <div style="margin-top: 20px; background: rgba(102,153,153,.18); border-radius: 12px; padding: 12px 24px; max-width: 900px; text-align:center;">
+      <p class="lt" style="font-size:12.5px;">
+        이사회의 네트워크와 전문성이 이 모든 방안의 열쇠입니다.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       10. 함께 만들어갈 조직
+  ══════════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">Part 3 — 이사회 역할</div>
+    <h2 class="center" style="margin-bottom: 8px;">함께 만들어갈 조직</h2>
+    <p class="sub" style="margin-bottom: 28px; font-size: 13px; max-width: 600px;">이사회는 나그네방이 올바른 방향으로 나아가고 있는지 살피고 결정하는 최고 의결 기관입니다.</p>
+
+    <!-- org chart -->
+    <div style="width:100%; max-width:820px;">
+      <div class="org-top">
+        <div class="org-node hl">
+          <div class="org-role">이사장</div>
+          <div class="org-name">유하영</div>
+        </div>
+      </div>
+      <div class="org-line"></div>
+      <div style="display:flex; justify-content:center; gap:0; position:relative; margin-bottom:8px;">
+        <div style="position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background: var(--tan); opacity:.4;"></div>
+      </div>
+      <div class="org-row" style="margin-bottom: 16px; flex-wrap: wrap; gap: 12px; padding-top: 8px;">
+        <div class="org-node">
+          <div class="org-role">이사</div>
+          <div class="org-name">김예빈</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">나그네방의 처음을<br />함께 시작한 공동 창업자</div>
+        </div>
+        <div class="org-node">
+          <div class="org-role">이사</div>
+          <div class="org-name">김서연</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">오랫동안 나그네방을<br />후원해주신 지지자</div>
+        </div>
+        <div class="org-node">
+          <div class="org-role">이사</div>
+          <div class="org-name">김은득</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">나그네방의 공동체 철학을<br />마련해주신 목사님</div>
+        </div>
+        <div class="org-node">
+          <div class="org-role">이사</div>
+          <div class="org-name">안예지</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">오랫동안 나그네방을<br />후원해주신 지지자</div>
+        </div>
+      </div>
+      <div class="org-row" style="gap: 12px; flex-wrap: wrap;">
+        <div class="org-node" style="border-top: 2px solid var(--tan);">
+          <div class="org-role" style="color: var(--tan);">감사</div>
+          <div class="org-name">김별이</div>
+          <div style="font-size:10px; color:var(--ink2); margin-top:4px; line-height:1.5;">재정 전문가<br />건강한 재정 기반 마련</div>
+        </div>
+        <div class="org-node" style="border-top: 2px solid var(--tan); background: var(--cream);">
+          <div class="org-role" style="color: var(--tan);">감사</div>
+          <div class="org-name" style="font-size:13px;">최요한</div>
+          <div style="font-size:10px; color:var(--tan); margin-top:3px;">섭외 예정</div>
+        </div>
+        <div class="org-node" style="border-top: 2px solid var(--sage); background: var(--cream);">
+          <div class="org-role" style="color: var(--sage);">자문위원</div>
+          <div class="org-name" style="font-size: 12px; line-height:1.7;">유한나 · 홍진주</div>
+          <div style="font-size:10px; color:var(--sage); margin-top:3px;">섭외 예정</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       10. 이사·감사 역할 안내 (split: image)
+  ══════════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">이사·감사 역할</div>
+    <h2 class="center" style="margin-bottom: 28px;">각자의 역할</h2>
+    <div class="g3" style="max-width: 860px; gap: 16px;">
+      <div class="role">
+        <h4>이사의 역할</h4>
+        <ul>
+          <li>주요 사업 방향 의결</li>
+          <li>예산·결산 심의</li>
+          <li>정관 변경 심의</li>
+          <li>재산 처분 결정</li>
+          <li>이사장 직무 보좌</li>
+        </ul>
+      </div>
+      <div class="role">
+        <h4>감사의 역할</h4>
+        <ul>
+          <li>재정 감사 (연 1회 이상)</li>
+          <li>총회·이사회 운영 감사</li>
+          <li>부정·부당 발견 시 보고</li>
+          <li>독립적 의견 진술권</li>
+          <li>이사회 소집 요구권</li>
+        </ul>
+      </div>
+      <div class="role" style="background: var(--ink);">
+        <h4 style="color: rgba(255,255,255,.55);">임기 및 처우</h4>
+        <ul style="padding-left: 0; list-style: none;">
+          <li style="color: rgba(255,255,255,.8); font-size: 12.5px; line-height: 2;">임기 2년, 연임 가능</li>
+          <li style="color: rgba(255,255,255,.8); font-size: 12.5px; line-height: 2;">보수 별도 지급 없음</li>
+          <li style="color: rgba(255,255,255,.8); font-size: 12.5px; line-height: 2;">업무 수행 실비 지급</li>
+          <li style="color: rgba(255,255,255,.8); font-size: 12.5px; line-height: 2;">연회비 (협의 후 확정)</li>
+          <li style="color: rgba(255,255,255,.8); font-size: 12.5px; line-height: 2;">정기 이사회 연 1회 이상</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       11. 총회 안건
+  ══════════════════════════════ -->
+  <div class="slide bg-cream">
+    <div class="slide-tag">Part 4 — 총회 안건</div>
+    <h2 style="margin-bottom: 24px; text-align:center;">오늘 의결할 사항들</h2>
+    <div style="width:100%; max-width: 760px;">
+      <div class="ag-item">
+        <div class="ag-n">1</div>
+        <div class="ag-t"><h4>정관 심의 및 승인</h4><p>사단법인 나그네방 정관 검토 후 의결</p></div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-n">2</div>
+        <div class="ag-t"><h4>이사장·이사·감사 선출</h4><p>임원 취임예정자 명단 확인 및 선출 의결 — <strong>이사 5인 이상 필수</strong></p></div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-n">3</div>
+        <div class="ag-t"><h4>사업계획서 및 수지예산서 심의</h4><p>2026년도 사업계획 및 예산안 검토·승인</p></div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-n">4</div>
+        <div class="ag-t"><h4>재산 출연 및 회비납부 결의</h4><p>예산의 10% 이상 운영자금 출연 확인, 연회비 약정</p></div>
+      </div>
+      <div class="ag-item">
+        <div class="ag-n">5</div>
+        <div class="ag-t"><h4>사무소 설치 확인</h4><p>서울시 성북구 성북로 16길 4-6, 1층을 주사무소로 확정</p></div>
+      </div>
+      <div class="ag-item" style="border-bottom: none;">
+        <div class="ag-n">6</div>
+        <div class="ag-t"><h4>회의록 서명 및 인감 날인</h4><p>발기인 전원 기명·인감날인 / 면과 면 사이 간인</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       12. 서명 안내
+  ══════════════════════════════ -->
+  <div class="slide bg-white">
+    <div class="slide-tag">서명 안내</div>
+    <h2 class="center" style="margin-bottom: 8px;">서명 전 체크리스트</h2>
+    <p class="sub" style="font-size: 13px; margin-bottom: 28px;">회의록 서명 전 아래 항목을 순서대로 확인해주세요.</p>
+    <div style="width: 100%; max-width: 700px;">
+      <div class="chk-item">
+        <div class="chk-box"></div>
+        <div class="chk-text"><strong>인감증명서</strong> 지참 확인 (발기인 전원 각 1부)</div>
+      </div>
+      <div class="chk-item">
+        <div class="chk-box"></div>
+        <div class="chk-text"><strong>정관</strong> 전 페이지 간인 (발기인 전원 인감 날인)</div>
+      </div>
+      <div class="chk-item">
+        <div class="chk-box"></div>
+        <div class="chk-text"><strong>창립총회 회의록</strong> 기명·인감날인 / 면과 면 사이 간인</div>
+      </div>
+      <div class="chk-item">
+        <div class="chk-box"></div>
+        <div class="chk-text"><strong>취임승낙서</strong> — 임원 각자 직위·임기 명시 후 날인</div>
+      </div>
+      <div class="chk-item">
+        <div class="chk-box"></div>
+        <div class="chk-text"><strong>재산출연승낙서</strong> + <strong>예금잔액증명서 원본</strong> 확인</div>
+      </div>
+      <div class="chk-item" style="border-bottom: none;">
+        <div class="chk-box"></div>
+        <div class="chk-text"><strong>총회 사진</strong> 촬영 (회의록 첨부용)</div>
+      </div>
+    </div>
+    <div style="margin-top: 20px; background: var(--cream); border-radius: 12px; padding: 14px 24px; max-width: 700px; width: 100%;">
+      <p style="font-size: 12px; color: var(--ink2); text-align: center;">서류 제출처: <strong>서울특별시</strong> 담당 부서 · 제출 후 허가까지 약 2~4주 소요</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       13. 마무리
+  ══════════════════════════════ -->
+  <div class="slide bg-ink" data-dark="true">
+    <div style="text-align: center; max-width: 700px;">
+      <div class="slide-tag lt">나그네방과 함께해 주셔서</div>
+      <h1 class="lt" style="margin-bottom: 20px;">감사합니다</h1>
+      <div class="div lt"></div>
+      <p class="lt" style="font-size: 15px; line-height: 2; margin-top: 20px;">
+        나그네방은 7년간 방 하나로 시작했지만,<br />
+        이제 더 많은 청년을 품을 준비를 하고 있습니다.<br /><br />
+        <span style="color: rgba(255,255,255,.4);">여러분의 참여가 그 출발점이 됩니다.</span>
+      </p>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── CONTROLS ── -->
+<button class="arrow prev" id="prevBtn" aria-label="이전">
+  <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+<button class="arrow next" id="nextBtn" aria-label="다음">
+  <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+<div class="nav-dots" id="dots"></div>
+<div class="slide-num" id="snum"></div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl = document.getElementById('dots');
+  const snum   = document.getElementById('snum');
+  const prev   = document.getElementById('prevBtn');
+  const next   = document.getElementById('nextBtn');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot'; d.setAttribute('aria-label', `슬라이드 ${i+1}`);
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+  const dots = Array.from(dotsEl.children);
+
+  function isDark(i) { return slides[i].dataset.dark === 'true'; }
+
+  function go(idx) {
+    slides[cur].classList.remove('active');
+    cur = (idx + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    const dk = isDark(cur);
+    dots.forEach((d, i) => {
+      d.className = 'dot' + (dk ? ' dk' : '') + (i === cur ? ' active' : '');
+    });
+    snum.textContent = `${cur + 1} / ${slides.length}`;
+    snum.className   = 'slide-num' + (dk ? ' lt' : '');
+    const ac = dk ? 'rgba(255,255,255,.1)' : 'rgba(255,255,255,.15)';
+    const cc = dk ? 'rgba(255,255,255,.75)' : '';
+    [prev, next].forEach(b => { b.style.background = ac; b.style.color = cc; });
+  }
+
+  prev.addEventListener('click', () => go(cur - 1));
+  next.addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); go(cur - 1); }
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  go(0);
+</script>
+</body>
+</html>
