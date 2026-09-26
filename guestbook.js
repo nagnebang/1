@@ -26,10 +26,13 @@ if (typeof FIREBASE_CONFIG === 'undefined') {
     setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  // 에세이는 정적 HTML로만 관리 — Firestore 불러오기 없음
+  // ═══════════════════════════════
+  //  에세이
+  // ═══════════════════════════════
+  const essayCache = {};
 
   window.openEssay = function (id) {
-    const e = undefined;
+    const e = essayCache[id];
     if (!e) return;
     const modal   = document.getElementById('essayModal');
     const content = document.getElementById('essayContent');
@@ -44,6 +47,48 @@ if (typeof FIREBASE_CONFIG === 'undefined') {
     document.body.style.overflow = 'hidden';
     modal.querySelector('.modal-box').scrollTop = 0;
   };
+
+  function buildEssayCard(doc) {
+    const d = doc.data();
+    const preview = (d.body || '').slice(0, 120).replace(/\n/g, ' ') + ((d.body || '').length > 120 ? '...' : '');
+    const thumb = d.thumbImage
+      ? `<div class="essay-thumb"><img src="${esc(d.thumbImage)}" alt="" loading="lazy" /></div>`
+      : `<div class="essay-thumb"></div>`;
+    const catClass = d.category === 'participant' ? ' participant' : '';
+    if (d.externalUrl) {
+      return `<a class="essay-card${catClass} fade-up visible" href="${esc(d.externalUrl)}" target="_blank" rel="noopener noreferrer">
+        ${thumb}
+        <div class="essay-body">
+          <span class="essay-date">${esc(d.date || '')}</span>
+          <h3>${esc(d.title || '')}</h3>
+          <p class="essay-preview">${esc(preview)}</p>
+          <span class="essay-author">${esc(d.author || '')}</span>
+          <span class="essay-more">전문 읽기 →</span>
+        </div>
+      </a>`;
+    }
+    essayCache[doc.id] = d;
+    return `<article class="essay-card${catClass} fade-up visible" onclick="openEssay('${doc.id}')">
+      ${thumb}
+      <div class="essay-body">
+        <span class="essay-date">${esc(d.date || '')}</span>
+        <h3>${esc(d.title || '')}</h3>
+        <p class="essay-preview">${esc(preview)}</p>
+        <span class="essay-author">${esc(d.author || '')}</span>
+        <span class="essay-more">전문 읽기 →</span>
+      </div>
+    </article>`;
+  }
+
+  db.collection('essays').orderBy('order').onSnapshot(snap => {
+    if (snap.empty) return; // Firestore 데이터 없으면 정적 HTML 유지
+    const opDocs = snap.docs.filter(d => d.data().category === 'operator');
+    const ptDocs = snap.docs.filter(d => d.data().category === 'participant');
+    const opGrid = document.getElementById('operatorEssays');
+    if (opGrid && opDocs.length) opGrid.innerHTML = opDocs.map(buildEssayCard).join('');
+    const ptGrid = document.getElementById('participantEssays');
+    if (ptGrid && ptDocs.length) ptGrid.innerHTML = ptDocs.map(buildEssayCard).join('');
+  }, err => console.log('Essays:', err.message));
 
   // ═══════════════════════════════
   //  갤러리
