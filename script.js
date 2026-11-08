@@ -175,8 +175,10 @@ const staticEssays = {
     body: `사춘기를 보내고 고등학교 3년
 예민함은 점점 더해졌고
 대학 합격을 하고나서는 정점을 찍었어요
+
 아무것도 해주지 못하는 부모에 원망이였을까요
 많은 동생들틈에 자기를 봐달라는 외침이였을까요
+
 그 아이를 품어내지 못하는 나의 문제 였을꺼예요
 
 서울 학교앞 반지하  누울곳도 없다던 몇곳을
@@ -186,6 +188,7 @@ const staticEssays = {
 
 그리고 그 다음날 아침 하영님에게
 우리 아이를 품고싶다는 연락을 받았어요
+
 모든것이 감사였어요
 어찌나 순서가 정확한지 몰라요
 마음에 응어리가 풀리고
@@ -294,6 +297,20 @@ async function submitDonor(type) {
         submittedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
+
+    // 정기 후원 신청 시 운영자에게 이메일 알림 발송
+    if (type === 'regular' &&
+        typeof emailjs !== 'undefined' &&
+        window.EMAILJS_SERVICE_ID !== 'YOUR_SERVICE_ID') {
+      const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+      emailjs.send(window.EMAILJS_SERVICE_ID, window.EMAILJS_TEMPLATE_ID, {
+        donor_name:   name  || '(미입력)',
+        donor_email:  email || '(미입력)',
+        donor_amount: amount || '(미입력)',
+        submitted_at: now,
+      }).catch(() => {}); // 알림 실패해도 후원자 경험에 영향 없도록
+    }
+
     showToast('기록이 저장되었습니다. 감사합니다 💛');
     document.getElementById('donorForm' + suffix).style.display = 'none';
   } catch (err) {
