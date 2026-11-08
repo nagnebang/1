@@ -67,7 +67,12 @@ if (typeof FIREBASE_CONFIG === 'undefined') {
         </div>
       </a>`;
     }
-    essayCache[doc.id] = d;
+    const enriched = Object.assign({}, d);
+    if (window.staticEssays) {
+      const staticKey = Object.keys(window.staticEssays).find(k => window.staticEssays[k].title === d.title);
+      if (staticKey) enriched.body = window.staticEssays[staticKey].body;
+    }
+    essayCache[doc.id] = enriched;
     return `<article class="essay-card${catClass} fade-up visible" onclick="openEssay('${doc.id}')">
       ${thumb}
       <div class="essay-body">
